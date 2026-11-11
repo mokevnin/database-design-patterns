@@ -28,6 +28,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Mermaid diagrams are rendered at build time in headless Chromium.
       - run: pnpm exec playwright install --with-deps chromium
+      # Rendered SVGs are content-addressed (diagram source + theme), so a
+      # restored cache only re-renders diagrams that changed. Without it every
+      # deploy renders every diagram of every locale from scratch.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: node_modules/.cache/honkit-mermaid
+          key: mermaid-${{ hashFiles('book/**/*.md', 'mermaid.config*.json', 'pnpm-lock.yaml') }}
+          restore-keys: mermaid-
       - run: mise run build
       - if: github.event_name != 'pull_request'
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0

@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: A polymorphic association stores a target type and ID in two columns with no foreign key, so the database cannot prove the referenced row exists.
 status: draft
 related: [exclusive-arc, class-table-inheritance, missing-foreign-keys]
 ---

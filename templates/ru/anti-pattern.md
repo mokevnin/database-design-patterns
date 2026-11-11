@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: <Одно предложение для поиска и предпросмотра ссылок, до 160 символов>
 status: draft
 related: []
 source_rev:

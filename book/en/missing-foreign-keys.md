@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: Missing foreign keys leave references as plain integers, so the database cannot stop orphaned rows or decide what deleting a parent does to its children.
 status: draft
 related: [polymorphic-associations, expand-contract]
 ---

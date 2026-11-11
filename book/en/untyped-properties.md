@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: Untyped properties store every attribute as a name and a text value, so the database cannot require, type-check or relate any of them.
 status: draft
 related: [typed-properties, json-column]
 ---

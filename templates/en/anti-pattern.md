@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: <One sentence for search results and link previews, under 160 characters>
 status: draft
 related: []
 source_rev:

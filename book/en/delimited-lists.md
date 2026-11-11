@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: A delimited list stores a relationship as a comma-separated string in one column, so the database cannot check members, enforce references or index membership.
 status: draft
 related: [association-table, repeated-columns]
 ---

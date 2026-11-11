@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: Inexact arithmetic keeps money and other exact decimal values in floating-point columns, so sums and comparisons drift from what the business expects.
 status: draft
 related: [quantity, double-entry-ledger]
 ---

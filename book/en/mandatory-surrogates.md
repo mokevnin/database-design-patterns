@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: Mandatory surrogates give every table a generated ID but declare nothing else unique, so the same business fact can be stored twice.
 status: draft
 related: [surrogate-key, natural-key, association-table]
 ---

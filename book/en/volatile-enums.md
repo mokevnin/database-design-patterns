@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: Volatile enums encode a business-maintained vocabulary as an enum type or CHECK list, so every new value is a schema change and retired values carry no metadata.
 status: draft
 related: [lookup-table]
 ---

@@ -46,6 +46,7 @@ Operating guide for agents (and humans) working in this repository.
 - `mise run build` — static build into `./dist`
 - `pnpm exec playwright install chromium` — one-off, needed to render diagrams
 - `mise run pdf` — PDFs for all locales
+- `plugins/honkit-plugin-seo` fills the website's `<head>` after the build: meta description, canonical, hreflang, Open Graph/Twitter tags and `dist/sitemap.xml`. The description is the frontmatter `description:` or else the first paragraph (see CONTRIBUTING.md); the preview image is `book/assets/cover/og-<locale>.png`. `pluginsConfig.seo.siteUrl` in `book/book.json` must match the deployed URL.
 - `mise run update` — bump project tools and dependencies in every workspace package; when hk changes, also update both versioned Pkl imports in `hk.pkl`
 
 ## Structure conventions

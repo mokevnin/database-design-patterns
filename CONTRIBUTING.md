@@ -33,8 +33,11 @@ group: data-modeling     # area (mirrors the heading in SUMMARY.md)
 status: draft            # draft | review | translated | done
 related: [some-slug]
 source_rev:              # for NON-canonical locales only (see below)
+description:             # search and link-preview summary (see below)
 ---
 ```
+
+The website's meta description and Open Graph description come from the chapter's first paragraph — a pattern's Intent — cut to its first sentence when it runs past 200 characters (`plugins/honkit-plugin-seo`). Set `description` only where that paragraph does not summarize the page: anti-patterns open with "Also known as", so every anti-pattern sets one sentence under 160 characters, and a translation translates it.
 
 ## Translation
 

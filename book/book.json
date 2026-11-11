@@ -3,7 +3,7 @@
   "description": "Database design patterns in the spirit of the Gang of Four",
   "author": "Hexlet",
   "language": "en",
-  "plugins": ["toolbar", "mermaid"],
+  "plugins": ["toolbar", "mermaid", "seo"],
   "pluginsConfig": {
     "toolbar": {
       "buttons": [
@@ -26,6 +26,12 @@
           "position": "left"
         }
       ]
+    },
+    "seo": {
+      "siteUrl": "https://mokevnin.github.io/database-design-patterns/",
+      "image": "assets/cover/og-{locale}.png",
+      "imageWidth": 1200,
+      "imageHeight": 630
     },
     "lunr": {
       "maxIndexSize": 10000000

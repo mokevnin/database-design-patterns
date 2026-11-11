@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: Fixed-depth queries traverse a tree with a fixed number of self-joins and silently drop every node deeper than the last join.
 status: draft
 related: [adjacency-list, closure-table]
 ---

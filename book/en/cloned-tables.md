@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: Cloned tables split one logical relation into copies per period or customer, so keys, constraints, grants and migrations must cover a growing list of tables.
 status: draft
 related: [table-partitioning, shared-schema]
 ---

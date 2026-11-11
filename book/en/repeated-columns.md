@@ -1,5 +1,6 @@
 ---
 kind: anti-pattern
+description: Repeated columns model a collection as numbered slots such as tag1, tag2 and tag3, fixing its capacity in the schema and letting members repeat.
 status: draft
 related: [association-table, delimited-lists]
 ---

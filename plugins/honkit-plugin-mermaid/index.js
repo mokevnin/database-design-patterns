@@ -30,6 +30,13 @@ let darkConfig = null;
 /** @type {Promise<import('mermaid-isomorphic').MermaidRenderer> | null} */
 let rendererPromise = null;
 
+// Every renderer call opens its own browser tab. Pages are generated
+// concurrently and a chapter can hold many diagrams in two themes, so unbounded
+// parallel calls open dozens of tabs at once and exhaust a CI runner's memory.
+// Renders therefore run one at a time through this chain.
+/** @type {Promise<unknown>} */
+let renderQueue = Promise.resolve();
+
 /**
  * Cache key for a diagram: its source plus the theme it is rendered with.
  *
@@ -77,7 +84,11 @@ async function render(source, config) {
   const renderer = await rendererPromise;
   // One diagram per call, so the SVG ids are derived from the content and stay
   // unique on a page that mixes freshly rendered and cached diagrams.
-  const [result] = await renderer([source], { mermaidConfig: config, prefix: `mermaid-${key}` });
+  const run = renderQueue.then(() =>
+    renderer([source], { mermaidConfig: config, prefix: `mermaid-${key}` })
+  );
+  renderQueue = run.catch(() => undefined);
+  const [result] = await run;
   if (result.status === 'rejected') {
     const reason = result.reason?.message ?? String(result.reason);
     throw new Error(`Mermaid diagram failed to render: ${reason}\n\n${source}`);

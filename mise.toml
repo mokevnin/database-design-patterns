@@ -1,4 +1,5 @@
 # One entry point for developers, git hooks and CI: `mise run setup`, then `mise run check`.
+# Every `mise install` (re)installs the git hooks through the postinstall hook below.
 # Node is pinned here; pnpm comes from package.json (packageManager).
 # Git hooks and the check set live in hk.pkl.
 min_version = "2026.11.3"
@@ -23,13 +24,16 @@ rumdl = "0.3.2"
 osv-scanner = "2.7.0"
 lychee = "0.24.2"
 
+# Outside a git checkout (a source tarball) there is nothing to hook into.
+[hooks]
+postinstall = "if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then hk install --mise; fi"
+
 [tasks.setup]
 description = "Install dependencies, pinned linters and git hooks"
 # Pass project tool names explicitly so unrelated global tools need no lockfile.
 run = [
   "{% set project = read_toml(path=config_root ~ '/mise.toml') %}mise install --locked {% for name, _ in project.tools %}{{ name }} {% endfor %}pnpm",
-  "pnpm install --frozen-lockfile",
-  "hk install --mise"
+  "pnpm install --frozen-lockfile"
 ]
 
 [tasks.serve]

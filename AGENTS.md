@@ -28,7 +28,7 @@ Operating guide for agents (and humans) working in this repository.
 ## Commits
 
 - Follow [Conventional Commits](https://www.conventionalcommits.org/), written in **English**.
-- Enforced by [commitlint](https://commitlint.js.org/) in the `commit-msg` git hook ([hk](https://hk.jdx.dev), `hk.pkl`, installed by `mise run setup`) and over the PR range in CI.
+- Enforced by [commitlint](https://commitlint.js.org/) in the `commit-msg` git hook ([hk](https://hk.jdx.dev), `hk.pkl`, installed by the `postinstall` hook in `mise.toml` on every `mise install`) and over the PR range in CI.
 - Examples: `feat: add soft delete pattern`, `docs: translate preface to es`, `ci: bump actions to latest`.
 
 ## Checks

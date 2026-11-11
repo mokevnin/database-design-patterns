@@ -1,0 +1,65 @@
+# One entry point for developers, git hooks and CI: `mise run setup`, then `mise run check`.
+# Node is pinned here; pnpm comes from package.json (packageManager).
+# Git hooks and the check set live in hk.pkl.
+min_version = "2026.11.3"
+
+[settings]
+idiomatic_version_file_enable_tools = ["pnpm"]
+lockfile = true
+lockfile_platforms = ["linux-x64", "macos-arm64"]
+
+[env]
+_.path = ["node_modules/.bin"]
+
+[tools]
+node = "26.13.0"
+hk = { version = "2.11.1", workflow = "release.yml" }
+pkl = "0.33.0"
+jactionlint = { version = "2.5.0", workflow = "release.yaml" }
+betterleaks = "1.10.0"
+typos = "1.52.0"
+rumdl = "0.3.2"
+"github:agent-sh/agnix" = "0.61.0"
+osv-scanner = "2.7.0"
+lychee = "0.24.2"
+
+[tasks.setup]
+description = "Install dependencies, pinned linters and git hooks"
+# Pass project tool names explicitly so unrelated global tools need no lockfile.
+run = [
+  "{% set project = read_toml(path=config_root ~ '/mise.toml') %}mise install --locked {% for name, _ in project.tools %}{{ name }} {% endfor %}pnpm",
+  "pnpm install --frozen-lockfile",
+  "hk install --mise"
+]
+
+[tasks.serve]
+description = "Local preview (Honkit serve)"
+run = "pnpm start"
+
+[tasks.build]
+description = "Static build into ./dist"
+run = "pnpm build"
+
+[tasks.pdf]
+description = "PDFs for all locales"
+run = ["pnpm pdf:ru", "pnpm pdf:en", "pnpm pdf:es"]
+
+[tasks.check]
+description = "Run every check (hk.pkl); CI runs the same task"
+run = "hk check --all"
+
+[tasks.fix]
+description = "Apply the safe autofixes"
+run = "hk fix --all"
+
+[tasks.audit]
+description = "Known vulnerabilities in pnpm-lock.yaml (CI runs it weekly)"
+run = "osv-scanner scan source -r ."
+
+[tasks.update]
+description = "Bump project tools and all workspace dependencies to latest"
+run = ["mise upgrade --bump --no-global --no-prune", "pnpm deps:update", "mise lock"]
+
+[tasks.clean]
+description = "Remove build output and installed deps"
+run = "rm -rf dist node_modules"

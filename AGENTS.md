@@ -1,0 +1,58 @@
+# AGENTS.md
+
+Operating guide for agents (and humans) working in this repository.
+
+## Language
+
+- Book content lives in `book/<locale>/` (ru/en/es); localized chapter skeletons in `templates/<locale>/`.
+- Everything else — READMEs, configs, CI, and the `book/` chrome outside locale folders — is written in **English**.
+- Book prose addresses the reader as «вы» in `ru` ("you" in `en`), never «ты». The `es` edition addresses the reader as «tú».
+
+## Diagrams
+
+- Diagrams are written as ```` ```mermaid ```` fences directly in the chapter, so the labels are translated together with the prose and GitHub renders them in the repo.
+- `plugins/honkit-plugin-mermaid` renders the fences into inline SVG at build time (Mermaid in headless Playwright), so diagrams also survive `honkit pdf`, which never runs JS.
+- Shared palette and theme live in `mermaid.config.json`. Use the `accent`, `warn` and `muted` classes (`node:::accent`) instead of per-diagram `classDef`.
+- The website also gets every diagram in a dark palette for the Honkit night theme: `mermaid.config.dark.json` holds only the keys that differ and is merged over `mermaid.config.json`. A new color or class in the light config needs its dark counterpart there, including the `accent`/`warn`/`muted` rules in `themeCSS`. The PDF gets the light palette only.
+- Rendered SVGs are cached in `node_modules/.cache/honkit-mermaid`, keyed by diagram source plus theme config. The theme is read once at startup, so restart `mise run serve` after editing `mermaid.config.json` or `mermaid.config.dark.json`.
+- Beyond `flowchart`, the types that survive this pipeline and the palette are `sequenceDiagram`, `stateDiagram-v2`, `gitGraph`, `quadrantChart`, `pie` and `sankey-beta`. Any other type (e.g. `erDiagram`) must be rendered in both themes and checked before it is used in a chapter; add it to this list once verified.
+- `sankey-beta` accepts **ASCII only in node names** (Mermaid 12.0.0) — quoting does not help, and Cyrillic or even Spanish accents raise a parse error. Its `title:` and `%%` comments do take non-ASCII. Where it is used, node labels stay English with a `%% TODO` to localize them once upstream is fixed.
+- Types that silently drop the frontmatter `title:` the book uses as a caption: `sankey-beta`, `mindmap`, `timeline`, `kanban`, `block-beta`, `architecture-beta`. Put the thesis in the paragraph under the diagram instead. `treemap-beta` scales label size with box area, so the smallest — usually most important — share is the least readable.
+- A diagram is read inside a ~770px column. Keep it under ~1200px wide — prefer `flowchart TB` over a long left-to-right chain, and remember that a note hung off a node with `-.-` widens the diagram.
+
+## Markdown formatting
+
+- Do not hard-wrap prose to a fixed column width. Keep each paragraph, list item, and blockquote on one physical source line; use line breaks only for intentional Markdown structure such as headings, separate list items, tables, fenced code, and paragraph boundaries.
+
+## Commits
+
+- Follow [Conventional Commits](https://www.conventionalcommits.org/), written in **English**.
+- Enforced by [commitlint](https://commitlint.js.org/) in the `commit-msg` git hook ([hk](https://hk.jdx.dev), `hk.pkl`, installed by `mise run setup`) and over the PR range in CI.
+- Examples: `feat: add soft delete pattern`, `docs: translate preface to es`, `ci: bump actions to latest`.
+
+## Checks
+
+- `mise run check` runs every check (jactionlint, betterleaks, typos, rumdl, agnix, oxlint, oxfmt, syncpack, local links, merge/case conflicts and symlinks) and must pass before a change is done; CI runs the same task, and the hk `pre-commit` hook runs the same steps on staged files. Steps live in `hk.pkl`. `mise run fix` applies the safe autofixes. Tool versions are pinned in `mise.toml` and `mise.lock`; pnpm is read from `package.json`. Oxfmt formats code and configuration; rumdl owns Markdown.
+- `.agents/skills/` (and the `.claude/skills/` symlinks into it) are vendored and pinned by hash in `skills-lock.json`: never edit them by hand.
+- Prefer an existing tool over a hand-written script, and install tools through `mise`, never through shell fallback chains.
+- Never disable a lint rule to get a change through. An exception is narrow (one path, one rule), carries a reason in the config, and needs a human decision.
+
+## Build / preview
+
+- Use mise 2026.11.3 or newer; CI pins 2026.11.4. Commit `mise.lock` alongside tool updates; it covers Linux x64 and macOS arm64.
+- `mise run setup` — install locked deps, pinned linters and git hooks
+- `mise run serve` — local preview (Honkit serve)
+- `mise run build` — static build into `./dist`
+- `pnpm exec playwright install chromium` — one-off, needed to render diagrams
+- `mise run pdf` — PDFs for all locales
+- `mise run update` — bump project tools and dependencies in every workspace package; when hk changes, also update both versioned Pkl imports in `hk.pkl`
+
+## Structure conventions
+
+- Chapter titles are short GoF-style noun names, 1–3 words per locale; the source's long name goes under «Также известен как».
+- A new chapter ships in `ru`, `en` and `es` in the same pass, each with its `SUMMARY.md` entry.
+- Patterns are flat files `book/<locale>/<slug>.md`; grouping lives only in `book/<locale>/SUMMARY.md`.
+- Shared binary assets and code samples in `book/assets/<slug>/`, referenced via `../assets/<slug>/...`. Diagrams are not assets — see above.
+- Canonical locale is `ru`: write a pattern in Russian first, then translate.
+- New pattern ideas are tracked in [CANDIDATES.md](CANDIDATES.md) — check it before writing a chapter, and record accepted/rejected there.
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for the full authoring workflow.

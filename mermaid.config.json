@@ -1,0 +1,63 @@
+{
+  "theme": "base",
+  "fontFamily": "Arial, 'Liberation Sans', Helvetica, sans-serif",
+  "themeVariables": {
+    "fontSize": "16px",
+    "primaryColor": "#eef3f9",
+    "primaryBorderColor": "#4a6fa5",
+    "primaryTextColor": "#1a2b3c",
+    "lineColor": "#4a6fa5",
+    "textColor": "#1a2b3c",
+    "titleColor": "#a5764a",
+    "clusterBkg": "transparent",
+    "clusterBorder": "#5b6b7c",
+    "edgeLabelBackground": "#ffffff",
+    "labelBoxBorderColor": "#4a6fa5",
+    "actorBkg": "#eef3f9",
+    "actorBorder": "#4a6fa5",
+    "actorTextColor": "#1a2b3c",
+    "signalColor": "#4a6fa5",
+    "signalTextColor": "#1a2b3c",
+    "noteBkgColor": "#f6f1e7",
+    "noteBorderColor": "#a5764a",
+    "noteTextColor": "#1a2b3c",
+    "git0": "#4a6fa5",
+    "git1": "#a5764a",
+    "git2": "#5b6b7c",
+    "git3": "#4a6fa5",
+    "gitBranchLabel0": "#ffffff",
+    "gitBranchLabel1": "#ffffff",
+    "gitBranchLabel2": "#ffffff",
+    "gitBranchLabel3": "#ffffff",
+    "commitLabelColor": "#1a2b3c",
+    "commitLabelBackground": "#ffffff",
+    "pie1": "#eef3f9",
+    "pie2": "#e3e9f0",
+    "pie3": "#f4f5f6",
+    "pie4": "#f6f1e7",
+    "pieStrokeColor": "#4a6fa5",
+    "pieOuterStrokeColor": "#4a6fa5",
+    "pieSectionTextColor": "#1a2b3c",
+    "pieLegendTextColor": "#1a2b3c"
+  },
+  "flowchart": {
+    "htmlLabels": false,
+    "curve": "basis",
+    "padding": 12,
+    "nodeSpacing": 45,
+    "rankSpacing": 55,
+    "wrappingWidth": 230
+  },
+  "sequence": {
+    "useMaxWidth": true,
+    "wrap": true
+  },
+  "themeCSS": ".accent rect, .accent polygon, .accent path { fill: #f6f1e7 !important; stroke: #a5764a !important; } .warn rect, .warn polygon, .warn path { fill: #f9eded !important; stroke: #a54a4a !important; } .muted rect, .muted polygon, .muted path { fill: #f4f5f6 !important; stroke: #5b6b7c !important; } .cluster rect { stroke-dasharray: 6 4 !important; stroke: #5b6b7c !important; } .cluster-label text { fill: #5b6b7c !important; } .nodes .node[id^=\"node-\"] rect { fill: #4a6fa5 !important; stroke: #4a6fa5 !important; } .node-labels text { fill: #1a2b3c !important; } text.actor { stroke: none !important; fill: #1a2b3c !important; }",
+  "htmlLabels": false,
+  "sankey": {
+    "useMaxWidth": true,
+    "showValues": true,
+    "linkColor": "#c9d6e6",
+    "nodeAlignment": "justify"
+  }
+}

@@ -1,6 +1,6 @@
 # Database Design Patterns
 
-A catalog of **database design patterns** in the spirit of the "Gang of Four" (GoF). It is a book built from markdown with [Honkit](https://github.com/honkit/honkit) (a GitBook fork), with print (PDF/EPUB) in mind.
+A catalog of **database design patterns** in the spirit of the "Gang of Four" (GoF): relational schemas for application databases, with PostgreSQL as the reference engine. Document, key-value and analytics modeling are separate books. It is a book built from markdown with [Honkit](https://github.com/honkit/honkit) (a GitBook fork), with print (PDF/EPUB) in mind.
 
 📖 **Online:** <https://mokevnin.github.io/database-design-patterns/>
 

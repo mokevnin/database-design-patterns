@@ -13,35 +13,41 @@ source_rev:
 
 ## Also known as
 
-<Synonyms and alternative names. Remove the section if none.>
+<Synonyms and the names the sources use (Fowler, Karwin, vendor docs). Remove the section if none.>
 
 ## Problem
 
-<The situation and forces that lead to the pattern. Why the naive solution fails.>
+<The situation and forces that lead to the pattern. Why the naive schema fails.>
 
 ## Solution
 
-<The idea at the level of principle, independent of implementation.>
+<The idea at the level of principle: which tables, keys and constraints carry it.>
+
+## Alternatives and selection
+
+<A compact decision panel: the sibling patterns that solve the same problem, and which requirement tips the choice. Say whether each sibling is a replacement, a complement, or an implementation option. Link the matching table in the Decision Atlas.>
 
 ## Structure
+
+<Name the tables, their keys and cardinalities, and the relationship the reader should notice.>
 
 ```mermaid
 ---
 title: <the short idea the diagram carries>
 ---
 flowchart LR
-  a["<step>"] --> b["<step>"]:::accent
+  a["<table>"] --> b["<table>"]:::accent
 ```
 
-<Walk through the diagram: the parts and how they interact.>
+<Walk through the diagram: what each table holds and how they reference each other.>
 
-## Participants / Components
+## Tables and invariants
 
-- **<Component>** — <role and responsibility>.
+- **<table>** <holds what; its key; the invariant it guarantees and the constraint that enforces it>.
 
 ## When to use
 
-- <Condition 1 under which the pattern fits.>
+- <Condition under which the pattern fits.>
 
 ## Consequences and trade-offs
 
@@ -50,11 +56,23 @@ flowchart LR
 
 ## Implementation
 
-1. <Step.>
+<Representative DDL, then the typical operations: insert, read, change. Show one invalid operation the schema rejects and the error it raises. Keep essential SQL inline; the full runnable script lives in `../assets/<slug>/`.>
 
-## Example
+```sql
+-- <DDL>
+```
 
-<Walkthrough with code from `../assets/<slug>/examples/`.>
+## Engine support
+
+<PostgreSQL is the reference engine. Note where other engines differ: native support, emulation, an extension, or a weaker guarantee. Name the engine version.>
+
+## Failure and concurrency
+
+<What happens under concurrent writes, retries and partial failures; which isolation level or lock the pattern needs; what breaks when it is missing.>
+
+## Migration
+
+<How to reach the pattern from the usual starting schema without downtime, and how to back out.>
 
 ## Anti-patterns and common mistakes
 
@@ -62,8 +80,8 @@ flowchart LR
 
 ## Known uses
 
-- <Where it shows up in real systems/frameworks.>
+- <Where it shows up: engines, frameworks, public schemas.>
 
 ## Related patterns
 
-- [<Name>](<slug>.md) — <how it relates>.
+- [<Name>](<slug>.md) <explains or complements the chosen approach>.

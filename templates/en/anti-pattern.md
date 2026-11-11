@@ -39,11 +39,17 @@ source_rev:
 
 **Before:**
 
-> <A poor phrasing.>
+```sql
+-- <The schema with the anti-pattern and a query that breaks on it.>
+```
 
 **After:**
 
-> <A good phrasing.>
+```sql
+-- <The corrected schema and the same query.>
+```
+
+<Migration steps from the old schema to the new one without data loss. If the original choice is sometimes defensible, name the conditions.>
 
 ## Related patterns and anti-patterns
 

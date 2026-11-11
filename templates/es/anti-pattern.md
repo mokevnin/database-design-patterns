@@ -39,11 +39,17 @@ source_rev:
 
 **Antes:**
 
-> <Una formulación pobre.>
+```sql
+-- <El esquema con el antipatrón y una consulta que falla sobre él.>
+```
 
 **Después:**
 
-> <Una buena formulación.>
+```sql
+-- <El esquema corregido y la misma consulta.>
+```
+
+<Pasos de migración del esquema antiguo al nuevo sin pérdida de datos. Si la elección original a veces es defendible, nombra las condiciones.>
 
 ## Patrones y antipatrones relacionados
 

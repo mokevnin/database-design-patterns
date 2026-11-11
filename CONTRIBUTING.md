@@ -9,7 +9,7 @@ The book is built from markdown with [Honkit](https://github.com/honkit/honkit).
 2. Create the chapter in the canonical locale: copy [`templates/ru/pattern.md`](templates/ru/pattern.md) to `book/ru/<slug>.md` and fill it in. Do not change the section headings — they are the same across all chapters of that language.
 3. Add a link in `book/ru/SUMMARY.md` under the right group heading (line order = order in the book).
 4. Draw diagrams as ```` ```mermaid ```` fences right in the chapter — they are rendered to SVG at build time and translated together with the surrounding text. Use the shared `accent` / `warn` / `muted` classes (`node:::accent`) so every diagram in the book shares one palette; the theme lives in `mermaid.config.json`, and its night-theme counterpart in `mermaid.config.dark.json`.
-5. Anything that is genuinely a file — images, sample code — goes in `book/assets/<slug>/` and is referenced with a relative path `../assets/<slug>/...`.
+5. Anything that is genuinely a file — images, runnable SQL scripts with the engine version they were checked on — goes in `book/assets/<slug>/` and is referenced with a relative path `../assets/<slug>/...`.
 6. Preview with `pnpm start`.
 
 ## Extend an existing pattern
@@ -21,11 +21,7 @@ The book has no margin notes or comment threads: an addition becomes part of the
 3. Edit `book/ru/<slug>.md` first. Keep the template headings; extend a section rather than adding a new one.
 4. Update `book/en/` and `book/es/` in the same PR if you can; otherwise say so in the PR and the maintainer will translate. Refresh `source_rev` in every translation you touch.
 
-Anti-patterns go into the separate "Anti-patterns" chapter and use `templates/<locale>/anti-pattern.md`.
-
-Tool profiles are not patterns. Put them under the relevant methodology section, add `kind: tool` and `checked_on: YYYY-MM-DD` to their front matter, and use the practical-card structure: installation, workflow, artifacts, distinctions, and selection criteria. Show the check date to readers because commands and product capabilities change faster than pattern descriptions.
-
-Recheck a tool profile against the tool's primary documentation before each book release and whenever its commands or capabilities are edited. Advance `checked_on` only after that verification; changing prose alone is not evidence that the product details are current.
+Anti-patterns go into the "Anti-patterns" group of `SUMMARY.md` and use `templates/<locale>/anti-pattern.md`. Name the harmful condition, say when the original choice is defensible, and give the source's term (for example, Karwin's) under "Also known as".
 
 ## Chapter front matter (optional but useful)
 

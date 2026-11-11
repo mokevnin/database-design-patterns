@@ -98,6 +98,39 @@ async function render(source, config) {
   return result.value.svg;
 }
 
+/**
+ * The diagram's caption from its frontmatter `title:`, used as the image's alt text.
+ *
+ * @param {string} source
+ * @returns {string}
+ */
+function captionOf(source) {
+  const frontmatter = /^\s*---\s*\n([\s\S]*?)\n\s*---/.exec(source);
+  const title = frontmatter && /^\s*title:\s*(.+?)\s*$/m.exec(frontmatter[1]);
+  return title ? title[1].replace(/^(['"])(.*)\1$/, '$2') : 'Diagram';
+}
+
+/**
+ * Embed a rendered SVG as an <img> with a data URI rather than inline markup.
+ * Inline SVG carries a large <style> block, and the built-in search plugin
+ * indexes page text after this hook with tags stripped but style text kept, so
+ * every diagram's CSS ended up in the search index. As an image attribute the
+ * SVG is invisible to the indexer; the caption stays searchable as alt text.
+ *
+ * @param {string} svg
+ * @param {string} caption
+ * @returns {string}
+ */
+function asImage(svg, caption) {
+  const viewBox = /viewBox="[-\d.]+ [-\d.]+ ([\d.]+) ([\d.]+)"/.exec(svg);
+  const size = viewBox
+    ? ` width="${Math.ceil(Number(viewBox[1]))}" height="${Math.ceil(Number(viewBox[2]))}"`
+    : '';
+  const alt = caption.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const src = `data:image/svg+xml;base64,${Buffer.from(svg, 'utf8').toString('base64')}`;
+  return `<img src="${src}" alt="${alt}"${size}>`;
+}
+
 module.exports = {
   website: {
     assets: './assets',
@@ -147,13 +180,14 @@ module.exports = {
       const figures = await Promise.all(
         fences.toArray().map(async (element) => {
           const source = $(element).text();
-          const light = await render(source, mermaidConfig);
+          const caption = captionOf(source);
+          const light = asImage(await render(source, mermaidConfig), caption);
           if (!withDark) {
             return `<figure class="mermaid">${light}</figure>`;
           }
-          const dark = await render(
-            source,
-            /** @type {import('mermaid').MermaidConfig} */ (darkConfig)
+          const dark = asImage(
+            await render(source, /** @type {import('mermaid').MermaidConfig} */ (darkConfig)),
+            caption
           );
           return `<figure class="mermaid mermaid-themed"><div class="mermaid-light">${light}</div><div class="mermaid-dark">${dark}</div></figure>`;
         })

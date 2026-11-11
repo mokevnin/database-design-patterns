@@ -3,7 +3,7 @@ figure.mermaid {
   text-align: center;
 }
 
-figure.mermaid svg {
+figure.mermaid img {
   max-width: 100%;
   height: auto;
 }

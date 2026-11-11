@@ -26,6 +26,9 @@
           "position": "left"
         }
       ]
+    },
+    "lunr": {
+      "maxIndexSize": 10000000
     }
   },
   "structure": {

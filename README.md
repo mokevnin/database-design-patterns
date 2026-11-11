@@ -40,7 +40,7 @@ Use [mise](https://mise.jdx.dev/) 2026.11.3 or newer; CI pins 2026.11.4. Node is
 The [Dev Quality Gates](https://github.com/mokevnin/dev-quality-gates) checks run through `hk.pkl`: code lint and formatting, workspace dependency consistency, Markdown, spelling, agent configuration, workflow security, secrets, local documentation links, conflict markers, filename case collisions and broken symlinks. Local links are checked offline so commits do not depend on external websites. Known dependency vulnerabilities are checked by the scheduled audit workflow.
 
 - How to add a pattern and how translations work — see [CONTRIBUTING.md](CONTRIBUTING.md).
-- The canonical locale is `ru`: a pattern is first written in Russian, then translated to `en`/`es`.
+- The canonical locale is `en`. For now the book is written in English only; `ru`/`es` translations come later.
 
 ## License
 

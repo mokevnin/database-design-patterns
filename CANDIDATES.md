@@ -27,10 +27,10 @@ The plan below comes from the source inventory in [research/schema-organization-
 
 | Slug | Pitch | Group | Status | Note |
 |------|-------|-------|--------|------|
-| `surrogate-key` | Generated key with no business meaning: bigint identity vs UUIDv4 vs UUIDv7/ULID. | identity | candidate | Fowler Identity Field; Ambler Introduce Surrogate Key. |
-| `natural-key` | Business attributes as the key, including composite keys, and when they stay stable enough. | identity | candidate | Composite keys live here and in `association-table`. |
-| `time-ordered-identifier` | IDs that sort by creation time: UUIDv7, ULID, Snowflake; generation and index locality. | identity | candidate | RFC 9562. |
-| `public-identifier` | Expose an internal ID or a separate, possibly prefixed, external one. | identity | candidate | Stripe-style prefixes; their rationale is only in an employee blog. |
+| `surrogate-key` | Generated key with no business meaning: bigint identity vs UUIDv4 vs UUIDv7/ULID. | identity | done | Fowler Identity Field; Ambler Introduce Surrogate Key. |
+| `natural-key` | Business attributes as the key, including composite keys, and when they stay stable enough. | identity | done | Composite keys live here and in `association-table`. |
+| `time-ordered-identifier` | IDs that sort by creation time: UUIDv7, ULID, Snowflake; generation and index locality. | identity | done | RFC 9562. |
+| `public-identifier` | Expose an internal ID or a separate, possibly prefixed, external one. | identity | done | Stripe-style prefixes; their rationale is only in an employee blog. |
 | `association-table` | Junction table for many-to-many links, with its own attributes and composite key. | relationships | candidate | Fowler Association Table Mapping; fix for Jaywalking. |
 | `table-split` | One-to-one split of optional or rarely read columns into a separate table. | relationships | candidate | Merges `one-to-one-split` and `vertical-partitioning`; keep their motivations apart. |
 | `ordered-collection` | User-defined order of rows: positions, uniqueness, concurrent reordering. | relationships | candidate | Added in review; not in the inventory yet. |

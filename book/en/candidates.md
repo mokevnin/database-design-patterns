@@ -12,10 +12,6 @@ Russian, English, and Spanish are welcome; participation requires a GitHub accou
 
 | Topic | Identifier | Discussion |
 |---|---|---|
-| Surrogate key — choose a generated key with no business meaning and compare numeric identifiers with UUIDs. | `surrogate-key` | Discussion not opened yet |
-| Natural key — use stable business attributes as a key, including composite keys. | `natural-key` | Discussion not opened yet |
-| Time-ordered identifier — generate UUIDv7, ULID, or Snowflake IDs with creation order and index locality in mind. | `time-ordered-identifier` | Discussion not opened yet |
-| Public identifier — choose between exposing an internal key and providing a separate external identifier with an optional prefix. | `public-identifier` | Discussion not opened yet |
 | Association table — store many-to-many relationships with their own attributes and a composite key. | `association-table` | Discussion not opened yet |
 | Table split — move optional or rarely read columns into a separate table with a one-to-one relationship. | `table-split` | Discussion not opened yet |
 | Ordered collection — store a user-defined row order and safely change it under concurrent requests. | `ordered-collection` | Discussion not opened yet |

@@ -12,16 +12,6 @@ Russian, English, and Spanish are welcome; participation requires a GitHub accou
 
 | Topic | Identifier | Discussion |
 |---|---|---|
-| Association table — store many-to-many relationships with their own attributes and a composite key. | `association-table` | Discussion not opened yet |
-| Table split — move optional or rarely read columns into a separate table with a one-to-one relationship. | `table-split` | Discussion not opened yet |
-| Ordered collection — store a user-defined row order and safely change it under concurrent requests. | `ordered-collection` | Discussion not opened yet |
-| Localized values — store attribute translations, enforce uniqueness per locale, and select a fallback translation. | `localized-values` | Discussion not opened yet |
-| Lookup table — constrain allowed values and choose between a lookup table, enum, CHECK, and domain. | `lookup-table` | Discussion not opened yet |
-| Status history — store the current status and transitions, preventing invalid changes even under concurrent writes. | `status-history` | Discussion not opened yet |
-| Adjacency list — represent a tree with parent references and traverse it using recursive CTEs. | `adjacency-list` | Discussion not opened yet |
-| Materialized path — store each row's ancestor path to query branches of a tree. | `materialized-path` | Discussion not opened yet |
-| Nested sets — speed up subtree reads with left and right node bounds at the cost of more complex updates. | `nested-sets` | Discussion not opened yet |
-| Closure Table — store all ancestor–descendant pairs in a separate table for hierarchy queries. | `closure-table` | Discussion not opened yet |
 | Single-table inheritance — store all subtypes in one table with a type discriminator and nullable columns. | `single-table-inheritance` | Discussion not opened yet |
 | Class-table inheritance — split shared and specific attributes between a supertype table and subtype tables with a shared key. | `class-table-inheritance` | Discussion not opened yet |
 | Concrete-table inheritance — store each concrete subtype in its own complete table without a shared table. | `concrete-table-inheritance` | Discussion not opened yet |

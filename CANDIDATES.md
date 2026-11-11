@@ -31,16 +31,16 @@ The plan below comes from the source inventory in [research/schema-organization-
 | `natural-key` | Business attributes as the key, including composite keys, and when they stay stable enough. | identity | done | Composite keys live here and in `association-table`. |
 | `time-ordered-identifier` | IDs that sort by creation time: UUIDv7, ULID, Snowflake; generation and index locality. | identity | done | RFC 9562. |
 | `public-identifier` | Expose an internal ID or a separate, possibly prefixed, external one. | identity | done | Stripe-style prefixes; their rationale is only in an employee blog. |
-| `association-table` | Junction table for many-to-many links, with its own attributes and composite key. | relationships | candidate | Fowler Association Table Mapping; fix for Jaywalking. |
-| `table-split` | One-to-one split of optional or rarely read columns into a separate table. | relationships | candidate | Merges `one-to-one-split` and `vertical-partitioning`; keep their motivations apart. |
-| `ordered-collection` | User-defined order of rows: positions, uniqueness, concurrent reordering. | relationships | candidate | Added in review; not in the inventory yet. |
-| `localized-values` | Translated attributes: translation tables, locale uniqueness, fallback. | relationships | candidate | Added in review; not in the inventory yet. |
-| `lookup-table` | Constrained vocabulary: lookup table vs enum type vs CHECK constraint or domain. | reference-and-state | candidate | Absorbs `enum-type` and `check-constraint-domain`; OTLT is its failure mode. |
-| `status-history` | Current status plus a log of transitions; allowed transitions enforced in tables. | reference-and-state | candidate | A transition-table FK checks the pair, not the current state; needs concurrency control. |
-| `adjacency-list` | Each row references its parent; recursive CTE for traversal. | hierarchies | candidate | Karwin Naive Trees as the failure mode; recursive queries are implementation material. |
-| `materialized-path` | Store the ancestor path in the row; ltree, hierarchyid. | hierarchies | candidate | Karwin/Celko name: Path Enumeration. |
-| `nested-sets` | Left/right bounds per node for fast subtree reads, costly writes. | hierarchies | candidate | Celko. |
-| `closure-table` | Separate table of all ancestor-descendant pairs. | hierarchies | candidate | Karwin; Kimball hierarchy bridge. Two cells of Karwin's comparison table need checking. |
+| `association-table` | Junction table for many-to-many links, with its own attributes and composite key. | relationships | done | Fowler Association Table Mapping; fix for Jaywalking. |
+| `table-split` | One-to-one split of optional or rarely read columns into a separate table. | relationships | done | Merges `one-to-one-split` and `vertical-partitioning`; keep their motivations apart. |
+| `ordered-collection` | User-defined order of rows: positions, uniqueness, concurrent reordering. | relationships | done | Added in review; not in the inventory yet. |
+| `localized-values` | Translated attributes: translation tables, locale uniqueness, fallback. | relationships | done | Added in review; not in the inventory yet. |
+| `lookup-table` | Constrained vocabulary: lookup table vs enum type vs CHECK constraint or domain. | reference-and-state | done | Absorbs `enum-type` and `check-constraint-domain`; OTLT is its failure mode. |
+| `status-history` | Current status plus a log of transitions; allowed transitions enforced in tables. | reference-and-state | done | A transition-table FK checks the pair, not the current state; needs concurrency control. |
+| `adjacency-list` | Each row references its parent; recursive CTE for traversal. | hierarchies | done | Karwin Naive Trees as the failure mode; recursive queries are implementation material. |
+| `materialized-path` | Store the ancestor path in the row; ltree, hierarchyid. | hierarchies | done | Karwin/Celko name: Path Enumeration. |
+| `nested-sets` | Left/right bounds per node for fast subtree reads, costly writes. | hierarchies | done | Celko. |
+| `closure-table` | Separate table of all ancestor-descendant pairs. | hierarchies | done | Karwin; Kimball hierarchy bridge. Two cells of Karwin's comparison table need checking. |
 | `single-table-inheritance` | All subtypes in one table with a type column and nullable subtype columns. | types-and-attributes | candidate | Fowler; Rails STI; Hibernate SINGLE_TABLE. |
 | `class-table-inheritance` | Supertype table plus one table per subtype sharing the key. | types-and-attributes | candidate | Fowler; Hibernate JOINED; Rails Delegated Types. Shared supertype is an application of it. |
 | `concrete-table-inheritance` | One full table per concrete subtype, no shared table. | types-and-attributes | candidate | Fowler; Hibernate TABLE_PER_CLASS. |

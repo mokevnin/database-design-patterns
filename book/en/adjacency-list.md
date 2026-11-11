@@ -40,21 +40,36 @@ See the [Decision Atlas](decision-atlas.md) for the full family comparison. Recu
 
 ```mermaid
 ---
-title: A subtree move changes one parent reference
+title: Each category references at most one parent in the same table
 ---
-flowchart TB
-  root["1 Catalog: parent NULL"]:::muted
-  books["2 Books: parent 1"]:::accent
-  sql["4 SQL: parent 2"]:::accent
-  tools["3 Tools: parent 1"]:::muted
-  move["Move Books: set parent to 3"]:::warn
-  sql --> books
-  books --> root
-  tools --> root
-  move -.-> books
+erDiagram
+  category |o..o{ category : "parent of"
+  category {
+    bigint category_id PK
+    text name
+    bigint parent_id FK "nullable for roots"
+  }
+  class category accent
 ```
 
-The arrows follow stored references upward. A parent can have many children; a child has zero or one parent. Moving Books under Tools leaves SQL's reference to Books untouched.
+The self-reference permits many children per parent and zero or one parent per child. Moving Books under Tools leaves SQL's reference to Books untouched.
+
+```mermaid
+---
+title: Moving a branch changes only its root's parent reference
+---
+flowchart TB
+  catalog["1 Catalog: parent NULL"]:::muted
+  tools["3 Tools: parent 1"]:::muted
+  books["2 Books: parent 1 becomes 3"]:::accent
+  sql["4 SQL: parent 2 stays unchanged"]:::accent
+  sql -->|unchanged| books
+  books -.->|old parent| catalog
+  books -->|new parent| tools
+  tools --> catalog
+```
+
+Arrows follow stored parent references upward; only the solid new link from Books is written by the move. SQL follows Books to its new location without any update to SQL's row.
 
 ## Tables and invariants
 
@@ -200,6 +215,29 @@ COMMIT;
 
 Suppose A and B are roots. One transaction moves A under B while another moves B under A. Each can see a valid old tree and pass its own ancestor check. Locking only the moved row does not serialize those checks. The example takes `SHARE ROW EXCLUSIVE` before any structural read; PostgreSQL documents that this mode [conflicts with itself and ordinary writes while permitting plain reads](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-TABLES). Every insert, move and delete must follow that protocol. Put these operations behind controlled routines or a single application write path rather than granting unrelated writers unrestricted structural updates.
 
+```mermaid
+---
+title: Serializing opposite moves lets the second cycle check see the first
+---
+sequenceDiagram
+  participant X as Session 1: A under B
+  participant T as category table
+  participant Y as Session 2: B under A
+  X->>T: LOCK SHARE ROW EXCLUSIVE
+  T-->>X: Granted
+  Y->>T: LOCK SHARE ROW EXCLUSIVE
+  Note over T,Y: Second structural writer waits
+  X->>T: Trigger walks B's ancestors without finding A
+  X->>T: Set A.parent_id = B
+  X->>X: COMMIT
+  T-->>Y: Lock granted
+  Y->>T: Trigger walks A then B
+  T-->>Y: Moving B would make a cycle
+  Y->>Y: Raise 23514, roll back
+```
+
+The second trigger runs after the first move commits and finds B in A's ancestry. The table lock protects the validation read, including rows other than the moved node.
+
 Keep validation and mutation in one transaction. If it fails, roll back both. Re-read the current parent after an uncertain commit before retrying a move; the intended state may already exist or another editor may have changed it. A larger system can replace the global lock with carefully designed per-tree locking or [Serializable transactions with complete retries](https://www.postgresql.org/docs/18/transaction-iso.html#XACT-SERIALIZABLE), but must prove that inserts, cross-tree moves and deletes all participate.
 
 ## Migration
@@ -207,6 +245,29 @@ Keep validation and mutation in one transaction. If it fails, roll back both. Re
 Add nullable parent IDs while the existing representation remains authoritative. Backfill by stable node IDs; resolve missing parents, multiple-parent ambiguities and cycles before switching writers. Start new writers on the lock-and-validation protocol and compare recursive results with the old representation. During backfill, bound diagnostic traversals or use `CYCLE` so bad legacy links cannot run unchecked.
 
 If readers need uninterrupted access, retain the old representation while you validate the new one and switch readers in stages. Schedule a short structural-write pause for final reconciliation and enabling constraints; ordinary readers can continue using the old data. Keep the old representation maintained through the rollback window. Reversing a move later requires its old parent, so record it in the migration log rather than attempting to infer it from the current tree.
+
+```mermaid
+---
+title: Parent links become authoritative only after validation and reconciliation
+---
+stateDiagram-v2
+  state "Old representation authoritative" as Old
+  state "Parent IDs backfilled and audited" as Validated
+  state "Structural writes paused" as Paused
+  state "New lock protocol and constraints enabled" as Ready
+  state "Readers switched; old form maintained" as Switched
+  [*] --> Old
+  Old --> Validated: Resolve missing parents and cycles
+  Validated --> Paused: Begin final reconciliation
+  Paused --> Ready: Reconcile final edits
+  Ready --> Switched: Resume writes; switch readers in stages
+  Switched --> Old: Revert during rollback window
+  class Old muted
+  class Validated,Ready,Switched accent
+  class Paused warn
+```
+
+Readers can use the old representation while structural writes pause for final reconciliation. The rollback arrow depends on continuing to maintain that old representation.
 
 ## Anti-patterns and common mistakes
 

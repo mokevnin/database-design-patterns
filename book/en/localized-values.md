@@ -46,15 +46,26 @@ See the [Decision Atlas](decision-atlas.md) for the full comparison. Per-languag
 ---
 title: Product identity is shared while text is unique per locale
 ---
-flowchart TB
-  product["product: product_id PK, default_locale"]:::accent
-  text["product_text: product_id + locale PK, name"]:::accent
-  locales["app_locale: supported locale PK"]:::muted
-  required["Default text must exist at commit"]:::warn
-  text -->|many translations to one product| product
-  text -->|each translation uses one locale| locales
-  product -->|deferred reference to default text| text
-  required -.-> product
+erDiagram
+  product ||--|{ product_text : has_translations
+  app_locale ||--o{ product_text : permits
+  app_locale ||--o{ product : is_default_locale_for
+  product_text ||--o| product : is_required_default_for
+  app_locale {
+    text locale PK
+  }
+  product {
+    bigint product_id PK, FK "part of default-text reference"
+    text sku UK
+    text default_locale FK "part of default-text reference"
+  }
+  product_text {
+    bigint product_id PK, FK
+    text locale PK, FK
+    text name
+  }
+  class product,product_text accent
+  class app_locale muted
 ```
 
 One product can have many translations. The composite default reference includes `product_id`, so it cannot be satisfied by another product's English row. The locale lookup admits a language but does not require every product to have that translation.
@@ -134,6 +145,26 @@ WHERE product_id = 1 AND locale = 'fr';
 
 The first result is `(CHAIR, fr, Chaise)` and `(DESK, en, Desk)`. The [lateral subquery](https://www.postgresql.org/docs/18/queries-table-expressions.html#QUERIES-LATERAL) selects text for each product; the default reference guarantees a candidate for committed products. Return `chosen.locale` so a caller can label or index the actual language. Do not cache the result solely by product ID when requests can have different fallback lists.
 
+```mermaid
+---
+title: Fallback selects the first existing translation row for each product
+---
+flowchart TB
+  request["Requested policy: fr-ca, fr, product default"]:::muted
+  regional{"This product has fr-ca text?"}:::accent
+  french{"This product has fr text?"}:::accent
+  default["Select this product's default translation"]:::accent
+  result["Return the chosen row's name and locale"]:::accent
+  request --> regional
+  regional -->|Yes| result
+  regional -->|No| french
+  french -->|Yes| result
+  french -->|No| default
+  default --> result
+```
+
+With the seeded rows, CHAIR takes the French branch and DESK reaches its English default. The deferred reference guarantees the default candidate for committed products, while the query supplies the preference order.
+
 ```sql
 INSERT INTO product_text VALUES (1, 'fr', 'Autre chaise');
 ```
@@ -171,6 +202,54 @@ The sample's [`C` collation](https://www.postgresql.org/docs/18/collation.html) 
 Write the product and default text in one transaction and treat commit as the success boundary. To change the default, create the new translation and update `default_locale` atomically; the deferred reference checks the final pair. Deleting the current default alone fails unless the same transaction replaces it or changes the default. Deleting the product cascades to its translations.
 
 Competing inserts for one product and locale meet the primary-key constraint. Competing edits to an existing translation need a [Version Column](version-column.md) if silent overwrites are unacceptable. For a workflow that changes the default and removes translations together, take a [product row lock](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-ROWS) first in every participating writer. Invalidate fallback caches when either translations or the default changes, since adding a more preferred translation changes the selected result even though the old text remains.
+
+```mermaid
+---
+title: The product lock serializes default changes with translation removal
+---
+sequenceDiagram
+  participant A as Session A
+  participant DB as PostgreSQL
+  participant B as Session B
+  Note over DB: Product 1 has en and fr text, default is en
+  A->>DB: BEGIN, then lock product 1 FOR UPDATE
+  B->>DB: BEGIN, then lock product 1 FOR UPDATE
+  Note over DB,B: B waits before changing translations
+  A->>DB: Set default_locale to fr
+  A->>DB: COMMIT
+  DB-->>A: Default text reference validated
+  DB-->>B: Product lock granted
+  B->>DB: Delete product 1's fr translation
+  B->>DB: COMMIT without replacement or default change
+  DB-->>B: 23503 on product_default_text_fk, rollback
+```
+
+B must re-evaluate the current default after taking the lock. The deferred constraint rejects removing that default without a replacement, even if the delete itself succeeded.
+
+```mermaid
+---
+title: A default-language change becomes valid only with matching text
+---
+stateDiagram-v2
+  direction TB
+  state "Committed product with default text" as Valid
+  state "Transaction holds product lock" as Locked
+  state "New default translation exists" as Text
+  state "Default points to new translation" as Pointed
+  state "Commit rejected; old state restored" as Failed
+  [*] --> Valid
+  Valid --> Locked: BEGIN; lock product
+  Locked --> Text: Create or retain target translation
+  Text --> Pointed: Update default_locale
+  Pointed --> Valid: COMMIT validates the product/locale pair
+  Locked --> Failed: Remove default alone; COMMIT
+  Failed --> Valid: Rollback
+  class Valid,Text,Pointed accent
+  class Locked muted
+  class Failed warn
+```
+
+The required pair includes the product ID, so another product's translation cannot satisfy the change. A failed commit restores the previous default and its text atomically.
 
 ## Migration
 

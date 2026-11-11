@@ -41,21 +41,39 @@ See the [Decision Atlas](decision-atlas.md) for the full table. Path encoding ch
 
 ```mermaid
 ---
-title: Moving Books rewrites both its path and every descendant path
+title: The composite parent reference checks identity and path prefix together
 ---
-flowchart TB
-  root["Catalog: 1"]:::muted
-  books["Books: 1.2"]:::accent
-  sql["SQL: 1.2.4"]:::accent
-  tools["Tools: 1.3"]:::muted
-  rewrite["After move: 1.3.2 and 1.3.2.4"]:::warn
-  root --> books
-  books --> sql
-  root --> tools
-  tools -.-> rewrite
+erDiagram
+  category |o..o{ category : "parent_id and parent_path"
+  category {
+    bigint category_id PK,UK "part of composite target"
+    text name
+    bigint parent_id FK "nullable for roots"
+    ltree path UK "also in composite target"
+    ltree parent_path FK "generated prefix; nullable for roots"
+  }
+  class category accent
 ```
 
 One row carries both node identity and its location. The path repeats ancestor IDs; the parent foreign key connects that encoded location to an existing row. SQL's ID remains `4` after the move even though its path changes.
+
+```mermaid
+---
+title: A branch move replaces its prefix while preserving descendant suffixes
+---
+flowchart TB
+  prefix["Move Books under Tools: replace 1.2 with 1.3.2"]:::warn
+  books["Books: ID 2; path 1.2"]:::muted
+  sql["SQL: ID 4; path 1.2.4"]:::muted
+  movedBooks["Books: path 1.3.2; parent 3"]:::accent
+  movedSQL["SQL: path 1.3.2.4; parent 2"]:::accent
+  prefix --> books
+  prefix --> sql
+  books -->|replace whole root path| movedBooks
+  sql -->|keep suffix .4| movedSQL
+```
+
+Both paths change, but only Books changes parent identity. SQL's generated `parent_path` becomes `1.3.2`, matching Books' new path when the deferred FK is checked.
 
 ## Tables and invariants
 
@@ -189,6 +207,30 @@ For a text implementation, include delimiters at both ends, such as `/1/2/`, and
 
 A concurrent insertion can derive a child's path from the old location while another transaction moves its parent. The foreign key prevents a committed mismatch in this schema, but it does not choose which editor's request should succeed. The example uses [a self-conflicting table lock](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-TABLES) acquired before reading paths, at [Read Committed](https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED), to serialize structural operations. Keep IDs immutable and include inserts and deletes in that protocol.
 
+```mermaid
+---
+title: An insertion waits to derive its path from the moved parent
+---
+sequenceDiagram
+  participant M as Session A: move Books
+  participant T as category table
+  participant I as Session B: add child 5
+  M->>T: LOCK SHARE ROW EXCLUSIVE
+  T-->>M: Granted
+  I->>T: LOCK SHARE ROW EXCLUSIVE
+  Note over T,I: Wait before reading Books' path
+  M->>M: Defer category_parent_path_fk
+  M->>T: Rewrite Books and SQL under 1.3.2
+  M->>M: Check FK immediately, COMMIT
+  T-->>I: Lock granted
+  I->>T: Read Books' path
+  T-->>I: 1.3.2
+  I->>T: Insert child 5 at 1.3.2.5, parent 2
+  I->>I: COMMIT
+```
+
+This insertion is a hypothetical operation after the sample move, using the same lock protocol. It reads the new prefix only after the move commits, so the child starts at the correct location.
+
 Run the whole rewrite in one transaction. Roll back on any failure and recompute prefixes from current rows before retrying. Do not split a large subtree move into independently committed batches: children would reference a mixture of locations. If a move is too large for one transaction, publish a separately built hierarchy version and switch readers to it after validation rather than exposing a half-moved tree.
 
 ## Migration
@@ -196,6 +238,25 @@ Run the whole rewrite in one transaction. Roll back on any failure and recompute
 Starting from an adjacency list, first resolve cycles and missing parents. Add a separate path projection and populate it recursively from every root using stable IDs. Keep parent links authoritative while a controlled writer updates both representations; compare each stored path with the path derived from the parent chain.
 
 Build and validate the replacement table with its path constraints before switching reads. Reconcile concurrent edits under a short structural-write lock at cutover, and preserve IDs so references from other tables do not change. Retain parent-based reads and dual maintenance for the rollback window. You can revert reads to recursion without changing node identities; stop path writes only after no reader depends on them.
+
+```mermaid
+---
+title: A validated path projection can be rolled back to parent-based reads
+---
+stateDiagram-v2
+  state "Parent links authoritative" as Parents
+  state "Paths built recursively from all roots" as Built
+  state "Dual maintenance; path checks validated" as Validated
+  state "Path readers active; parent reads retained" as Paths
+  Parents --> Built: Resolve cycles and missing parents
+  Built --> Validated: Compare paths with parent chains
+  Validated --> Paths: Reconcile edits under structural lock
+  Paths --> Validated: Revert readers to recursion
+  class Parents muted
+  class Built,Validated,Paths accent
+```
+
+The cutover changes the read representation while stable IDs and parent links remain available. Returning readers to recursion is possible throughout the dual-maintenance rollback window.
 
 ## Anti-patterns and common mistakes
 

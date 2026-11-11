@@ -43,14 +43,18 @@ Use the [Decision Atlas](decision-atlas.md) for the full comparison. Keeping col
 ---
 title: A shared key limits optional details to one row per product
 ---
-flowchart TB
-  listing["Listing reads core attributes"]:::muted
-  core["product: product_id PK, sku, name"]:::accent
-  detail["product_detail: product_id PK and FK, specification"]:::accent
-  absent["A product may have no detail"]:::warn
-  listing --> core
-  detail -->|one detail to one product| core
-  absent -.-> detail
+erDiagram
+  product ||--o| product_detail : optionally_extends
+  product {
+    bigint product_id PK
+    text sku UK
+    text name
+  }
+  product_detail {
+    bigint product_id PK, FK
+    text specification
+  }
+  class product,product_detail accent
 ```
 
 The detail uses the same identity as its owner. No second generated ID or redundant unique index is needed. The foreign key points from detail to core; that direction alone does not require a detail for every core row.
@@ -128,6 +132,26 @@ INSERT INTO account_private VALUES (10, 'B-10');
 COMMIT;
 ```
 
+```mermaid
+---
+title: Opposing foreign keys require matching account and private key sets
+---
+erDiagram
+  account ||--|| account_private : requires_at_commit
+  account_private ||--|| account : belongs_to
+  account {
+    bigint account_id PK, FK "deferred reference to private"
+    text display_name
+  }
+  account_private {
+    bigint account_id PK, FK "immediate reference to account"
+    text billing_reference
+  }
+  class account,account_private accent
+```
+
+Both directions are mandatory at transaction boundaries. Only the reverse reference from `account` is deferred, permitting parent-first insertion inside the transaction.
+
 Both rows now exist. An account inserted alone fails at commit:
 
 ```sql
@@ -137,6 +161,30 @@ COMMIT;
 ```
 
 The error is SQLSTATE `23503`: `ERROR: insert or update on table "account" violates foreign key constraint "account_requires_private"`, with `DETAIL: Key (account_id)=(11) is not present in table "account_private".` The failed transaction leaves no account `11`. Deleting account `10` cascades to its private row; deleting only the private row cannot leave an account without its required extension. The script checks both behaviors.
+
+```mermaid
+---
+title: A temporary missing extension cannot survive commit
+---
+stateDiagram-v2
+  direction TB
+  state "Neither account row exists" as Empty
+  state "Parent inserted; reverse check deferred" as Parent
+  state "Both rows inserted in the transaction" as Pair
+  state "Matching pair committed" as Stored
+  state "Commit rejected; transaction rolled back" as Failed
+  [*] --> Empty
+  Empty --> Parent: BEGIN; insert account
+  Parent --> Pair: Insert account_private
+  Parent --> Failed: COMMIT without private row
+  Pair --> Stored: COMMIT validates reverse reference
+  Failed --> Empty
+  class Parent warn
+  class Pair,Stored accent
+  class Empty,Failed muted
+```
+
+Successful inserts do not complete the operation until the deferred check passes at commit. If the private row is missing, rollback removes the newly inserted parent too.
 
 ## Engine support
 
@@ -152,11 +200,60 @@ Create or change both parts in one transaction when they form one business chang
 
 A split can let independent field groups use different row locks, but that benefit disappears if every operation first locks the core row. If a rule spans both parts, adopt one lock order, core before detail, for every participating writer. PostgreSQL's [row-lock and deadlock rules](https://www.postgresql.org/docs/18/explicit-locking.html) explain why inconsistent ordering can deadlock. A [Version Column](version-column.md) on the core protects detail edits only when every such edit also checks and advances that version in the same transaction.
 
+```mermaid
+---
+title: A shared core-first lock order serializes changes spanning both parts
+---
+sequenceDiagram
+  participant A as Session A
+  participant DB as PostgreSQL
+  participant B as Session B
+  Note over A,B: Both operations enforce a rule spanning core and detail
+  A->>DB: BEGIN, then lock product 1 FOR UPDATE
+  DB-->>A: Core lock granted
+  B->>DB: BEGIN, then lock product 1 FOR UPDATE
+  Note over DB,B: B waits before taking a detail lock
+  A->>DB: Lock product_detail 1, change both parts
+  A->>DB: COMMIT
+  DB-->>B: Core lock granted
+  B->>DB: Lock product_detail 1, read and change both parts
+  B->>DB: COMMIT
+```
+
+Taking the core lock first keeps the second writer from holding the detail while waiting for the core. This protocol serializes these combined changes, so the split alone does not provide concurrent editing of them.
+
 ## Migration
 
 Create the extension table first. Deploy writers that update old columns and the new row atomically. Backfill in bounded batches while locking each source row with the same protocol as live writers; otherwise an old copy can overwrite a newer detail. Compare values and distinguish absent groups from groups containing null fields before switching reads.
 
 For mandatory extensions, populate and verify every row before adding the reverse foreign key; PostgreSQL permits [adding it `NOT VALID` and validating separately](https://www.postgresql.org/docs/18/sql-altertable.html). Apply deferred insertion rules to all writers before enforcing the cycle. DDL still needs a planned lock window. Retain old columns during the [Expand and Contract](expand-contract.md) overlap so reads can switch back. If the new model permits absent detail rows, define how rollback represents them in the old columns before dropping anything.
+
+```mermaid
+---
+title: Backfill under the writer lock before making the split authoritative
+---
+flowchart TB
+  create["Create extension table"]:::muted
+  writers["Deploy atomic writes to old columns and extension"]:::accent
+  backfill["Backfill bounded batches under the shared core lock"]:::accent
+  compare["Compare values and absent-group semantics"]:::accent
+  mandatory{"Mandatory extension?"}:::accent
+  reverse["Populate every extension; deploy deferred insertion protocol"]:::accent
+  validate["Add reverse foreign key NOT VALID; validate"]:::accent
+  reads["Switch reads; retain old columns for rollback"]:::accent
+  retire["Retire old columns after the overlap"]:::warn
+  create --> writers
+  writers --> backfill
+  backfill --> compare
+  compare --> mandatory
+  mandatory -->|Yes| reverse
+  reverse --> validate
+  validate --> reads
+  mandatory -->|No| reads
+  reads --> retire
+```
+
+The backfill and live writers use the same locking protocol to avoid restoring stale details. The mandatory variant adds a completeness check and reverse reference before the final read switch.
 
 ## Anti-patterns and common mistakes
 

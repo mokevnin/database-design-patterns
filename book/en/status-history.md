@@ -44,24 +44,39 @@ The last option resembles Kimball's [accumulating snapshot fact table](https://w
 
 ```mermaid
 ---
-title: The locked order supplies the source while the foreign key validates the edge
+title: History references both an order and an allowed directed pair
 ---
-flowchart TB
-  command["Command: order, expected revision, target, actor, reason"]:::muted
-  writer["move_order: lock, check, append, update"]:::accent
-  order["sales_order: order_id PK, current status, revision"]:::accent
-  history["order_status_history: order_id + revision PK"]:::accent
-  edges["status_transition: from_status + to_status PK"]:::muted
-  status["order_status: code PK"]:::muted
-  reject["Wrong revision or forbidden edge: roll back"]:::warn
-  command --> writer
-  writer --> order
-  writer --> history
-  history -->|many moves to one order| order
-  history -->|each move references an allowed pair| edges
-  order --> status
-  edges --> status
-  writer --> reject
+erDiagram
+  direction TB
+  order_status ||..o{ sales_order : "current status"
+  order_status ||..o{ status_transition : "from_status"
+  order_status ||..o{ status_transition : "to_status"
+  sales_order ||--o{ order_status_history : "records"
+  status_transition ||..o{ order_status_history : "permits pair"
+  order_status {
+    text code PK
+  }
+  status_transition {
+    text from_status PK,FK
+    text to_status PK,FK
+  }
+  sales_order {
+    bigint order_id PK
+    text status_code FK
+    bigint revision
+    timestamptz created_at
+  }
+  order_status_history {
+    bigint order_id PK,FK
+    bigint revision PK
+    text from_status FK "composite edge FK"
+    text to_status FK "composite edge FK"
+    timestamptz changed_at
+    text actor
+    text reason
+  }
+  class sales_order,order_status_history accent
+  class order_status,status_transition muted
 ```
 
 An order has zero or more accepted moves. Each edge can occur in many orders' histories. Source and destination reference the same vocabulary, but direction matters: permitting `paid → shipped` does not permit its reverse. Current state is stored for direct reads, so the write path must maintain its agreement with the history.
@@ -184,6 +199,23 @@ FROM workflow_example.order_status_history
 WHERE order_id = 1001 ORDER BY revision;
 ```
 
+```mermaid
+---
+title: The seeded workflow permits four directed moves
+---
+stateDiagram-v2
+  [*] --> draft: Create at revision 0
+  draft --> paid: Payment captured
+  draft --> cancelled: Cancel before payment
+  paid --> shipped: Carrier pickup
+  paid --> cancelled: Cancel after payment
+  class draft muted
+  class paid,shipped accent
+  class cancelled warn
+```
+
+The four business arrows are exactly the seeded `status_transition` rows; the creation arrow is not a history row. There is no reverse arrow from `shipped` to `draft`, so the pair FK rejects that request.
+
 Both calls return the new revision, first `1`, then `2`. Current state is `(1001, shipped, 2)`. The two history rows describe `draft → paid` by `user:42` for `Payment captured` and `paid → shipped` by `user:81` for `Carrier pickup`. A forbidden return to draft is rejected:
 
 ```sql
@@ -206,6 +238,28 @@ The script also demonstrates the FK's limit under owner privileges: manually ins
 
 At PostgreSQL Read Committed, two calls with expected revision zero contend on the same order lock. After the winner commits revision one, the waiting locking read obtains the updated row and its revision check fails. If the winner rolls back, the waiter can proceed from revision zero. This follows PostgreSQL's [locking-read behavior](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-ROWS). Locking and revision checks serve different purposes: the lock coordinates the write, while the revision rejects a command based on an older view of the order.
 
+```mermaid
+---
+title: The waiting command checks the revision after acquiring the lock
+---
+sequenceDiagram
+  participant A as Session A: pay, expect 0
+  participant O as Order 1001
+  participant B as Session B: cancel, expect 0
+  A->>O: SELECT FOR UPDATE
+  O-->>A: draft, revision 0, lock held
+  B->>O: SELECT FOR UPDATE
+  Note over O,B: Wait for A's transaction
+  A->>A: Insert history revision 1: draft to paid
+  A->>O: Set paid, revision 1
+  A->>A: COMMIT both writes
+  O-->>B: paid, revision 1, lock acquired
+  B->>B: Expected 0 differs from 1
+  B->>B: Raise P0001, roll back without history
+```
+
+Both requested edges are legal from `draft`, but only the first command uses the current revision. The waiter fails before inserting history, preserving one coherent chain.
+
 Return success only after the caller's transaction commits. If the history insert fails, current state is unchanged; if the following update fails, the preceding insert is rolled back too. Do not catch an error and then commit only one side. The timestamp is not a reliable global ordering key; revisions establish order only within one entity.
 
 After a lost response, do not automatically reinterpret a retry as a fresh transition from the new state. Repeating the old revision will conflict, but that conflict alone does not tell you whether this client's earlier request won. Use an [Idempotency Record](idempotency-record.md), committed with the move, when the API must return the original result. Keep multi-order operations in a consistent order of order IDs to reduce deadlocks, and retry aborted transactions according to PostgreSQL's [deadlock guidance](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-DEADLOCKS).
@@ -219,6 +273,22 @@ Start from your current-status column by cleaning its vocabulary and defining th
 Create the history and rule tables, add a revision to existing orders, and deploy the new writer. During the [Expand and Contract](expand-contract.md) overlap, route every legacy status update through the same locked operation or a compatibility adapter. For each baseline batch, take order locks shared with the new writer and mark which orders have been baselined, so a live move cannot race with a stale snapshot. Establish the restricted application privileges before claiming that every accepted move is recorded. Plan DDL lock windows; PostgreSQL's [`NOT VALID` and later validation](https://www.postgresql.org/docs/18/sql-altertable.html) can separate FK installation from checking existing rows.
 
 Reconcile the current revision and status with the last recorded move, or the baseline if no move exists, before switching reporting. Keep old reads available during rollout. To back out, you can return readers to the current-status column while continuing to maintain history; reverting to unrestricted status writes ends the completeness guarantee. Preserve the history and record any resulting gap rather than pretending it can later be reconstructed.
+
+```mermaid
+---
+title: Reliable history starts at a baseline protected from live moves
+---
+flowchart TB
+  rules["Clean vocabulary; define allowed edges"]:::muted
+  writer["Create rule and history tables; add revisions"]:::accent
+  route["Route every status writer through locked operation"]:::accent
+  baseline["Lock each baseline batch; record observed state and cutover"]:::accent
+  restrict["Restrict direct writes; reconcile baseline or last move"]:::accent
+  reporting["Switch reporting; retain current-status reads"]:::muted
+  rules --> writer --> route --> baseline --> restrict --> reporting
+```
+
+The baseline shares order locks with live moves, preventing a stale snapshot from replacing a newer state. It marks where reliable history begins without inventing earlier transitions.
 
 ## Anti-patterns and common mistakes
 

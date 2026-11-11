@@ -42,17 +42,45 @@ See the [Decision Atlas](decision-atlas.md) for the full comparison. Avoid [Mand
 ---
 title: Resolve the public handle once and join by the internal key
 ---
-flowchart TB
-  request["Request: public_id + authenticated account scope"]:::muted
-  resolve["customer: public_id UNIQUE, customer_id PK"]:::accent
-  orders["customer_order: customer_id FK"]:::accent
-  reject["Unknown or unauthorized customer"]:::warn
-  request --> resolve
-  resolve -->|internal join| orders
-  request -->|no permitted match| reject
+erDiagram
+  customer ||--o{ customer_order : receives
+  customer {
+    bigint customer_id PK
+    bigint account_id
+    text public_id UK
+    text display_name
+  }
+  customer_order {
+    bigint order_id PK
+    bigint customer_id FK
+  }
+  class customer accent
+  class customer_order muted
 ```
 
 Many orders reference one customer by its internal key. A public lookup must include the authenticated account scope; knowing a valid handle alone is insufficient. The example includes the account filter but leaves credential verification to the application.
+
+```mermaid
+---
+title: Account scope gates resolution before the internal join
+---
+flowchart TB
+  request["Public handle from request"]:::muted
+  auth["Account scope from authenticated server context"]:::accent
+  lookup["Find customer by public_id and account_id"]:::accent
+  match{"Permitted match?"}:::accent
+  reject["Unknown or unauthorized customer"]:::warn
+  join["Join customer_order using customer_id"]:::accent
+  response["Return response with public handle"]:::muted
+  request --> lookup
+  auth --> lookup
+  lookup --> match
+  match -->|No| reject
+  match -->|Yes| join
+  join --> response
+```
+
+The account scope comes from authentication, independently of the requested handle. Only a permitted match supplies the internal key used by subsequent joins.
 
 ## Tables and invariants
 
@@ -134,6 +162,33 @@ SELECT customer_id FROM customer_order WHERE order_id = 1;
 
 The order still references customer `2`; the old public handle no longer resolves. This single-column implementation deliberately invalidates old handles. If compatibility requires old links to work, retain them in an alias table with global handle uniqueness and a foreign key to the customer. Route all resolution through that table so an old handle cannot be reassigned to another customer.
 
+```mermaid
+---
+title: Retained aliases map every published handle to one customer
+---
+erDiagram
+  customer ||--o{ customer_alias : retains
+  customer ||--o{ customer_order : receives
+  customer {
+    bigint customer_id PK
+    bigint account_id
+    text public_id UK "current handle"
+    text display_name
+  }
+  customer_alias {
+    text public_id PK "all published handles including current"
+    bigint customer_id FK
+  }
+  customer_order {
+    bigint order_id PK
+    bigint customer_id FK
+  }
+  class customer,customer_alias accent
+  class customer_order muted
+```
+
+This alias variant extends the single-column SQL example: reserve every issued handle in the alias table and keep the current handle there too. Global alias uniqueness prevents reassignment, while the rotation transaction must keep alias creation and current-handle selection consistent.
+
 ## Engine support
 
 - **PostgreSQL 18:** use the shown text column and [`uuidv4()`](https://www.postgresql.org/docs/18/functions-uuid.html). An unprefixed external UUID can instead use native `uuid` storage.
@@ -147,6 +202,47 @@ The order still references customer `2`; the old public handle no longer resolve
 Create the row and its public handle in the same transaction. Let the unique constraint catch a collision; PostgreSQL [waits and rechecks conflicting concurrent inserts](https://www.postgresql.org/docs/18/index-unique-checks.html). A genuinely new random-handle collision calls for a fresh handle. A retry after an uncertain commit calls for resolving the original operation, for example through an [Idempotency Record](idempotency-record.md), rather than blindly allocating another customer. These uniqueness rules need no higher isolation level by themselves.
 
 For concurrent rotations, use a conditional update including the previous handle, as shown, and require one affected row. If alias retention is required, make alias creation and current-handle selection one transaction and serialize rotations for the customer. Decide whether old handles redirect, continue resolving or become invalid before exposing rotation as an API operation.
+
+```mermaid
+---
+title: Only one rotation can replace the same previous handle
+---
+sequenceDiagram
+  participant A as Session A
+  participant DB as PostgreSQL
+  participant B as Session B
+  Note over A,B: Both requests expect old handle P for account 42
+  A->>DB: BEGIN, then UPDATE P to Q WHERE public_id=P AND account_id=42
+  DB-->>A: One row updated, customer row locked
+  B->>DB: BEGIN, then UPDATE P to R WHERE public_id=P AND account_id=42
+  Note over DB,B: Wait for A's row lock
+  A->>DB: COMMIT
+  DB-->>B: Recheck predicate, zero rows updated
+  B->>DB: ROLLBACK
+```
+
+At read committed isolation, the waiting update rechecks the changed row and no longer finds P. Requiring one affected row makes B's stale rotation an explicit failure.
+
+```mermaid
+---
+title: Rotation policy decides the fate of an already published handle
+---
+stateDiagram-v2
+  direction TB
+  state "Current published handle" as Current
+  state "Invalid old handle" as Invalid
+  state "Retained resolving alias" as Alias
+  [*] --> Current: Issue handle
+  Current --> Invalid: Rotate using single-column SQL
+  Current --> Alias: Rotate with alias retention
+  Alias --> Alias: Resolve to the same customer
+  Invalid --> Invalid: Reject old lookup
+  class Current accent
+  class Alias muted
+  class Invalid warn
+```
+
+The states describe the old handle, not the customer: a new current handle replaces it during rotation. The SQL example takes the invalidation path; alias retention requires the additional storage and transaction policy above.
 
 ## Migration
 

@@ -36,20 +36,59 @@ Evaluate a proposed natural key against actual write workflows. Require it at cr
 
 See the [Decision Atlas](decision-atlas.md) for the full comparison. A composite key is particularly useful for an [Association Table](association-table.md); [Mandatory Surrogates](mandatory-surrogates.md) warns against adding another ID while losing the pair invariant.
 
+```mermaid
+---
+title: Business-key stability determines whether references should carry it
+---
+flowchart TB
+  known{"Business key mandatory at creation?"}:::accent
+  stable{"Scope and equality settled; corrections manageable?"}:::accent
+  width{"Key short enough for dependent references?"}:::accent
+  natural["Natural Key; include every component"]:::accent
+  surrogate["Surrogate Key; retain business uniqueness"]:::muted
+  public{"Need an external handle that hides the business key?"}:::accent
+  handle["Add Public Identifier"]:::muted
+  done["Use the chosen reference key"]:::muted
+  known -->|No| surrogate
+  known -->|Yes| stable
+  stable -->|No| surrogate
+  stable -->|Yes| width
+  width -->|No| surrogate
+  width -->|Yes| natural
+  natural --> public
+  surrogate --> public
+  public -->|Yes| handle
+  public -->|No| done
+```
+
+Composite identity is useful only when its whole scope is known and acceptable to every dependent. The public-handle decision remains separate from the primary-key choice.
+
 ## Structure
 
 ```mermaid
 ---
 title: A line number identifies a line only inside its order
 ---
-flowchart TB
-  order["sales_order: order_number PK"]:::accent
-  line["order_line: order_number + line_number PK"]:::accent
-  note["line_note: same pair as PK and FK"]:::muted
-  change["Renumbering propagates through both references"]:::warn
-  line -->|many lines to one order| order
-  note -->|zero or one note per line| line
-  change -.-> order
+erDiagram
+  sales_order ||--o{ order_line : contains
+  order_line ||--o| line_note : annotates
+  sales_order {
+    text order_number PK
+    text buyer_name
+  }
+  order_line {
+    text order_number PK, FK
+    integer line_number PK
+    text product_code
+    integer quantity
+  }
+  line_note {
+    text order_number PK, FK
+    integer line_number PK, FK
+    text note
+  }
+  class sales_order,order_line accent
+  class line_note muted
 ```
 
 The line carries the order number directly, so you can find its contents without joining merely to recover that number. A note carries the complete line identity. In this example, renumbering the order cascades through both levels.
@@ -137,11 +176,57 @@ Let the unique constraint arbitrate competing inserts rather than checking for a
 
 Allocating a line number is a different problem. If you calculate `MAX(line_number) + 1`, serialize that allocation for the affected order, for example by taking a [`FOR UPDATE` lock](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-ROWS) on its parent inside the inserting transaction, with every allocator following the same protocol. Otherwise expect a conflict and retry. Keep the lock order consistent when correcting several orders. After an uncertain commit, read the original pair and compare its contents; do not automatically create another numbered line.
 
+```mermaid
+---
+title: Lock the order before allocating its next line number
+---
+sequenceDiagram
+  participant A as Session A
+  participant DB as PostgreSQL
+  participant B as Session B
+  A->>DB: BEGIN, then lock sales_order SO-204 FOR UPDATE
+  DB-->>A: Parent lock granted
+  B->>DB: BEGIN, then lock sales_order SO-204 FOR UPDATE
+  Note over DB,B: B waits on the same parent
+  A->>DB: Read maximum line 1, insert (SO-204, 2)
+  A->>DB: COMMIT
+  DB-->>B: Parent lock granted
+  B->>DB: Read maximum line 2, insert (SO-204, 3)
+  B->>DB: COMMIT
+```
+
+At read committed isolation, B reads the line numbers in a new statement after acquiring the lock. The primary key still rejects duplicate pairs from a writer that bypasses this allocation protocol.
+
 ## Migration
 
 Start by finding nulls, duplicates and values whose equality your application interprets differently. Resolve them before making the business key authoritative. Keep the current surrogate while you build a unique index on the natural columns [concurrently](https://www.postgresql.org/docs/18/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY). Add natural-reference columns to children, write both forms, and backfill by the old ID. Add and [validate new foreign keys](https://www.postgresql.org/docs/18/sql-altertable.html), then compare both routes before switching reads. Allow short lock windows for DDL and postpone dropping the old references.
 
 You can retain the surrogate primary key indefinitely and expose the natural key as an alternate key. To reverse a completed logical switch while both sets of columns remain, restore the old read path and continue dual writes. If business corrections have occurred, resolve by the retained surrogate mapping rather than an obsolete number.
+
+```mermaid
+---
+title: Validate natural references while the surrogate mapping still exists
+---
+stateDiagram-v2
+  direction TB
+  state "Surrogate references active" as Old
+  state "Business values cleaned and uniquely indexed" as Clean
+  state "Both reference forms written and backfilled" as Dual
+  state "Natural foreign keys validated; routes agree" as Valid
+  state "Reads resolve by natural key" as Natural
+  state "Surrogate retained as mapping" as Retained
+  [*] --> Old
+  Old --> Clean: Resolve nulls and duplicates
+  Clean --> Dual: Add child columns
+  Dual --> Valid: Validate and compare
+  Valid --> Natural: Switch reads
+  Natural --> Retained: Keep rollback identity
+  Retained --> Old: Restore old reads; keep dual writes
+  class Clean,Dual,Valid,Natural accent
+  class Old,Retained muted
+```
+
+The logical switch does not require dropping the surrogate primary key. Keeping its mapping lets a rollback find the same entity even after a business number changes.
 
 ## Anti-patterns and common mistakes
 

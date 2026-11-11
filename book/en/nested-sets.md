@@ -40,21 +40,33 @@ See the [Decision Atlas](decision-atlas.md) for the full family comparison. Leav
 
 ```mermaid
 ---
-title: Descendant intervals fit entirely inside their ancestor
+title: Stable category IDs are separate from unique traversal positions
 ---
-flowchart TB
-  root["Catalog: 1 .. 8"]:::muted
-  books["Books: 2 .. 5"]:::accent
-  sql["SQL: 3 .. 4"]:::accent
-  tools["Tools: 6 .. 7"]:::muted
-  gap["Insert at 5: shift endpoints at or after 5"]:::warn
-  root --> books
-  books --> sql
-  root --> tools
-  gap -.-> books
+erDiagram
+  category {
+    bigint category_id PK
+    text name
+    bigint lft UK "deferred uniqueness"
+    bigint rgt UK "deferred uniqueness"
+  }
+  class category accent
 ```
 
-Books contains SQL's two endpoints; Tools is disjoint from Books. The arrows illustrate containment rather than foreign keys. Each row stores the category and its own interval; this version stores no parent column.
+Each row stores the category and its own interval; this version stores no parent column or parent foreign key. The two unique constraints keep left and right positions distinct within their respective columns, while global tree validity still needs the write protocol and audits.
+
+```mermaid
+---
+title: Depth-first entry and exit positions encode nested intervals
+---
+block-beta
+  columns 4
+  c1["1: Catalog enters"] b2["2: Books enters"] s3["3: SQL enters"] s4["4: SQL exits"]
+  b5["5: Books exits"] t6["6: Tools enters"] t7["7: Tools exits"] c8["8: Catalog exits"]
+  class c1,c8,t6,t7 muted
+  class b2,b5,s3,s4 accent
+```
+
+Read left to right across each row: depth-first entry and exit positions encode nested intervals, placing SQL's `[3,4]` inside Books' `[2,5]`. Tools' `[6,7]` is disjoint from Books, and all eight positions are used exactly once.
 
 ## Tables and invariants
 
@@ -126,6 +138,21 @@ INSERT INTO category
 SELECT 5, 'Indexes', pos, pos + 1 FROM insertion;
 COMMIT;
 ```
+
+```mermaid
+---
+title: Inserting a leaf opens two positions and shifts unrelated siblings
+---
+flowchart TB
+  lock["Lock category before reading bounds"]:::muted
+  position["Read Books.rgt: insertion position 5"]:::accent
+  shift["Add 2 to every endpoint at or after 5"]:::accent
+  changed["Books: 2..7; Tools: 8..9; Catalog: 1..10"]:::warn
+  leaf["Insert Indexes: 5..6; COMMIT"]:::accent
+  lock --> position --> shift --> changed --> leaf
+```
+
+The gap opens at Books' old right endpoint, so Tools shifts despite being outside the edited branch. SQL's endpoints stay `[3,4]`, and the new leaf occupies the two freed positions.
 
 Books becomes `[2,7]`; the new leaf is `[5,6]`, and Tools shifts to `[8,9]`. To move Books under Tools, use Tools' current right endpoint as the insertion target. The following update translates endpoints inside Books' interval and shifts the endpoints between the old and new locations:
 
@@ -199,6 +226,29 @@ COMMIT;
 
 Two inserts can read the same right endpoint and both attempt to open the same gap. A concurrent move can also invalidate every saved position. The example runs at [Read Committed](https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED) and acquires [`SHARE ROW EXCLUSIVE`](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-TABLES) before reading bounds. All structural writers use it. Keep gap opening, insertion and validation in one transaction, and roll back the entire operation on failure.
 
+```mermaid
+---
+title: The second insertion reads a fresh endpoint after the first commits
+---
+sequenceDiagram
+  participant A as Session A: insert Indexes
+  participant T as category table
+  participant B as Session B: insert another leaf
+  A->>T: LOCK SHARE ROW EXCLUSIVE
+  T-->>A: Granted, read Books.rgt = 5
+  B->>T: LOCK SHARE ROW EXCLUSIVE
+  Note over T,B: Wait before reading insertion position
+  A->>T: Shift endpoints, insert at 5..6
+  A->>A: COMMIT, deferred unique checks pass
+  T-->>B: Lock granted
+  B->>T: Read Books.rgt
+  T-->>B: 7, not cached position 5
+  B->>T: Shift endpoints, insert at 7..8
+  B->>B: COMMIT
+```
+
+The second leaf is a hypothetical concurrent insertion into Books. Its gap is chosen from the committed bounds, so it does not reuse the first insertion's saved position.
+
 The move statement updates all sample rows, including unchanged endpoints; a production implementation can narrow the affected range after proving the same transformation. A per-node row lock is insufficient because numbering edits affect other nodes. Never commit half a renumbering or retry with positions cached before rollback. On an uncertain commit, inspect the node's current ancestry under the lock before deciding whether to repeat the operation.
 
 ## Migration
@@ -206,6 +256,26 @@ The move statement updates all sample rows, including unchanged endpoints; a pro
 Treat nested sets as a new projection when starting from parent references. Validate the source tree, choose an explicit sibling ordering and assign entry/exit numbers in a shadow table. Check all `2n` endpoints, detect crossing intervals and compare each subtree against the source traversal before publishing the result.
 
 For active editors, capture structural edits while building the projection and reconcile them under a brief structural-write pause. Ordinary readers can stay on the existing representation until the new version is ready. Switch reads first while retaining the source tree and rebuild path; switch writes only if maintaining nested sets directly is justified. To back out, return reads to the retained parent representation. If bounds are your only source, recover each node's parent as its closest containing interval before discarding them; reject corrupt crossings before that conversion.
+
+```mermaid
+---
+title: Publish numbered intervals only after comparing them with the source tree
+---
+stateDiagram-v2
+  state "Validated parent tree" as Source
+  state "Shadow intervals numbered in sibling order" as Numbered
+  state "Density, crossings and subtrees audited" as Audited
+  state "Nested-set reads published; source retained" as Published
+  [*] --> Source
+  Source --> Numbered: Assign entry and exit positions
+  Numbered --> Audited: Compare with source traversal
+  Audited --> Published: Pause structural writes; reconcile edits
+  Published --> Source: Return reads to retained parents
+  class Source muted
+  class Numbered,Audited,Published accent
+```
+
+Auditing checks the meaning of every interval as well as the `2n` endpoints. Keeping the parent tree maintained gives readers a rollback target and provides a source for rebuilding the projection.
 
 ## Anti-patterns and common mistakes
 

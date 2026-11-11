@@ -47,19 +47,42 @@ A PostgreSQL [domain](https://www.postgresql.org/docs/18/sql-createdomain.html) 
 
 ```mermaid
 ---
-title: Retirement hides a choice while existing references remain valid
+title: Every order references one vocabulary entry
 ---
-flowchart TB
-  orders["sales_order: order_id PK, status_code FK"]:::accent
-  codes["order_status: code PK, label, sort_order, is_active"]:::accent
-  choices["New assignments require an active code"]:::muted
-  retired["Retired code stays for existing orders"]:::warn
-  orders -->|many orders to one code| codes
-  choices -->|trigger checks availability| codes
-  retired -.-> codes
+erDiagram
+  order_status ||..o{ sales_order : "classifies"
+  order_status {
+    text code PK
+    text label
+    integer sort_order
+    boolean is_active
+  }
+  sales_order {
+    bigint order_id PK
+    text status_code FK
+  }
+  class order_status accent
+  class sales_order muted
 ```
 
 An order has one status; a status can serve many orders or none. Reading existing orders joins all referenced codes, including retired ones. Only the choices query filters by availability. Display position is an attribute, so changing it does not change references.
+
+```mermaid
+---
+title: Retirement changes assignment policy without breaking old references
+---
+stateDiagram-v2
+  state "Active code" as Active
+  state "Retired code" as Retired
+  [*] --> Active: Insert vocabulary entry
+  Active --> Active: Assign to an order
+  Active --> Retired: Set is_active = false
+  Retired --> Retired: Read or save an unchanged assignment
+  class Active accent
+  class Retired warn
+```
+
+A retired entry remains a valid FK target for existing orders, while the trigger rejects new assignments to it. Retirement changes availability, not the code's meaning.
 
 ## Tables and invariants
 
@@ -187,6 +210,29 @@ CREATE TABLE lookup_example.domain_order (
 );
 ```
 
+```mermaid
+---
+title: Fixed vocabularies constrain each value without a referenced row
+---
+erDiagram
+  direction LR
+  enum_order {
+    bigint order_id PK
+    fixed_status status "enum: draft or paid"
+  }
+  checked_order {
+    bigint order_id PK
+    text status "CHECK: draft or paid"
+  }
+  domain_order {
+    bigint order_id PK
+    status_domain status "domain CHECK: draft or paid"
+  }
+  class enum_order,checked_order,domain_order muted
+```
+
+These are three independent alternatives: none has a status FK or a row for per-value metadata. The enum, column check or domain supplies the membership rule instead.
+
 Keep a CHECK expression local to the value being checked. PostgreSQL [does not support CHECK constraints as cross-table integrity rules](https://www.postgresql.org/docs/18/ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS); hiding a dictionary query in a function does not turn it into a maintained foreign key.
 
 ## Engine support
@@ -201,6 +247,28 @@ Keep a CHECK expression local to the value being checked. PostgreSQL [does not s
 
 The FK settles membership; the trigger and dictionary update settle retirement. Under PostgreSQL [Read Committed](https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED), if an assignment locks the active code first, retirement waits until that assignment finishes. If retirement commits first, the trigger reads the retired row and rejects a new assignment. Multiple assignments can hold shared locks concurrently. Keep transactions short because a label edit also waits behind these shared locks.
 
+```mermaid
+---
+title: The shared code lock orders assignment before retirement
+---
+sequenceDiagram
+  participant A as Session A: assign
+  participant S as order_status draft
+  participant B as Session B: retire
+  A->>S: Trigger SELECT FOR SHARE
+  S-->>A: is_active = true, hold shared lock
+  B->>S: UPDATE is_active = false
+  Note over S,B: Retirement waits for A's lock
+  A->>A: Insert order and COMMIT
+  S-->>B: Acquire update lock
+  B->>B: COMMIT retirement
+  A->>S: Trigger checks a later assignment
+  S-->>A: is_active = false
+  A->>A: Reject with 23514, roll back
+```
+
+The first assignment survives because it precedes retirement under the shared lock. A later assignment sees the retired flag and fails even if its form still offers the code.
+
 If the application caches choices, invalidate that cache after dictionary changes, but keep the database check: a user can submit a form opened before retirement. Handle the rejection as a stale choice. Do not filter retired values from existing-order reads or a report can lose valid orders. A lookup table also permits `paid` to become `draft` if both are active; use [Status History](status-history.md) when legal moves matter.
 
 ## Migration
@@ -208,6 +276,22 @@ If the application caches choices, invalidate that cache after dictionary change
 Inventory distinct stored values and resolve typos and ambiguous meanings before seeding the dictionary. Retain a mapping from each old spelling to its chosen code. From a text column, you can keep that column and add the FK as [`NOT VALID`, then validate it](https://www.postgresql.org/docs/18/sql-altertable.html) after cleanup. The constraint checks new writes while validation handles old rows. Plan short DDL lock windows.
 
 From an enum, add a text reference column, deploy writers that maintain both forms, and backfill using the agreed mapping. Validate membership, compare reads, then switch consumers before dropping the old column. Install the active-check trigger after the retained assignments are established; do not accidentally treat historical retired assignments as new choices. Keep new-only codes inactive until old writers no longer need the enum representation. During the [Expand and Contract](expand-contract.md) overlap you can revert reads, but an old enum cannot represent a code introduced only in the new table. Delay those additions or define rollback behavior explicitly.
+
+```mermaid
+---
+title: Enum migration delays new codes until old writers are retired
+---
+flowchart TB
+  map["Resolve spellings and seed dictionary"]:::muted
+  expand["Add text FK column; deploy dual writers"]:::accent
+  backfill["Backfill retained assignments; validate FK"]:::accent
+  guard["Install active-check trigger; compare reads"]:::accent
+  switch["Switch consumers; retire old enum writers"]:::accent
+  newcodes["Enable new-only codes after rollback planning"]:::warn
+  map --> expand --> backfill --> guard --> switch --> newcodes
+```
+
+Backfill precedes availability enforcement so retained retired assignments can be established. Enabling a code outside the old enum is the point where reverting readers alone may no longer suffice.
 
 ## Anti-patterns and common mistakes
 

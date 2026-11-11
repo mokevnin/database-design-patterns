@@ -32,6 +32,24 @@ Generate a timestamp-leading surrogate and retain a primary-key constraint. For 
 
 With a random UUIDv7 suffix, same-millisecond IDs have no generation order; the [RFC's optional monotonicity mechanisms](https://www.rfc-editor.org/rfc/rfc9562.html#section-6.2) apply to the chosen generator. A monotonic ULID factory's state is likewise local. Neither gives you a shared suffix order across machines. For canonical ULID text, use ASCII ordering as the spec requires. Do not put a ULID string into a UUID column or label its arbitrary binary representation “UUIDv7.”
 
+```mermaid
+---
+title: UUIDv7 leads with time but reserves bits for version and variant
+config:
+  packet:
+    bitsPerRow: 64
+    bitWidth: 12
+---
+packet-beta
+  0-47: "Unix milliseconds (48 bits)"
+  48-51: "7"
+  52-63: "rand_a (12 bits)"
+  64-65: "10"
+  66-127: "rand_b (62 bits)"
+```
+
+The version field is `0111` and the variant is `10`; the remaining 74 bits are split between `rand_a` and `rand_b`. A generator may use some of those bits for fractions or counters, so the layout alone does not promise order within a millisecond.
+
 ## Alternatives and selection
 
 | Sibling | Relationship | Deciding requirement |
@@ -46,18 +64,21 @@ The [Decision Atlas](decision-atlas.md) gathers the full table. Choosing UUIDv7 
 
 ```mermaid
 ---
-title: Many generators share a key space without sharing a commit order
+title: Delivery identity combines an event key and a destination
 ---
-flowchart TB
-  app["Application: UUIDv7 before insertion"]:::muted
-  db["Database: uuidv7 default"]:::muted
-  event["event_record: event_id PK, source_reference UNIQUE"]:::accent
-  delivery["event_delivery: event_id FK + destination PK"]:::accent
-  clock["Generation clock is not commit order"]:::warn
-  app --> event
-  db --> event
-  delivery -->|many destinations to one event| event
-  event --> clock
+erDiagram
+  event_record ||--o{ event_delivery : delivers_to
+  event_record {
+    uuid event_id PK
+    text source_reference UK
+    text payload
+  }
+  event_delivery {
+    uuid event_id PK, FK
+    text destination PK
+  }
+  class event_record accent
+  class event_delivery muted
 ```
 
 Both generation paths populate the same key column. Delivery rows refer to an event without depending on which path allocated its ID. The source reference, not the generated ID alone, identifies a repeated import.
@@ -142,6 +163,29 @@ Keep IDs unchanged across delivery retries and retain source uniqueness for requ
 
 Clock skew and independent suffix generation prevent a universal generation order; neither generation order nor ID order establishes commit order. An old client can submit an ID below a reader's current cursor. Use a [Transactional Outbox](transactional-outbox.md) or another explicit delivery protocol for reliable consumption rather than polling only `id > last_seen`.
 
+```mermaid
+---
+title: A late commit can fall behind an identifier cursor
+---
+sequenceDiagram
+  participant A as Writer A
+  participant DB as PostgreSQL
+  participant B as Writer B
+  participant R as Reader
+  A->>A: Generate lower ID L
+  A->>DB: BEGIN, then insert event L
+  B->>B: Generate higher ID H
+  B->>DB: BEGIN, insert event H, then COMMIT
+  R->>DB: Read committed events ordered by ID
+  DB-->>R: H is visible, L is uncommitted
+  R->>R: Advance last_seen to H
+  A->>DB: COMMIT
+  R->>DB: Read WHERE event_id > H
+  DB-->>R: L is excluded despite its later commit
+```
+
+Both inserts have valid unique IDs, yet the cursor misses L permanently if it only moves upward. Reliable delivery needs a protocol independent of the generation timestamp.
+
 For Snowflake, establish exclusive machine-ID ownership and its restart policy before accepting traffic. The [original implementation](https://github.com/twitter-archive/snowflake/tree/snowflake-2010) refuses generation after a backward clock movement until time passes the last generated value and protects against same-millisecond sequence rollover. Decide how your selected implementation reports these conditions; do not silently fall back to a potentially overlapping generator.
 
 ## Migration
@@ -149,6 +193,31 @@ For Snowflake, establish exclusive machine-ID ownership and its restart policy b
 For an existing UUID key, you may change only the generation default and preserve all stored IDs and foreign keys. Do not install the example's v7-only check while v4 rows remain. Mixed versions preserve identity but do not make historical random keys time-sortable; order historical queries by an explicit timestamp. PostgreSQL supports changing defaults through [`ALTER TABLE`](https://www.postgresql.org/docs/18/sql-altertable.html).
 
 For an integer key, add a separate UUID column, generate new values for future rows and backfill old rows without pretending those new IDs encode original creation times. Build uniqueness, dual-write child references and validate foreign keys before switching reads; see [Expand and Contract](expand-contract.md). Keep the old mapping until rollback is no longer needed. Reverting a default is easy; withdrawing IDs already published to clients is a separate contract change.
+
+```mermaid
+---
+title: Changing an allocator preserves UUID identity but not historical time order
+---
+flowchart TB
+  key{"Existing key type?"}:::accent
+  uuid["UUID: change the generation default"]:::accent
+  mixed["Keep stored IDs and foreign keys; allow mixed versions"]:::muted
+  integer["Integer: add UUID column and allocate for new rows"]:::accent
+  backfill["Backfill; build uniqueness; retain old mapping"]:::accent
+  children["Dual-write child references; validate foreign keys"]:::accent
+  switch["Compare paths and switch reads"]:::accent
+  history["Use an explicit timestamp for historical ordering"]:::warn
+  key -->|UUID| uuid
+  uuid --> mixed
+  mixed --> history
+  key -->|Integer| integer
+  integer --> backfill
+  backfill --> children
+  children --> switch
+  switch --> history
+```
+
+Changing a UUID default leaves historical keys untouched, while integer conversion requires a reference migration. Neither route recovers original creation times from newly generated IDs.
 
 ## Anti-patterns and common mistakes
 

@@ -37,20 +37,53 @@ Use a surrogate primary key when other records need a stable reference to the me
 
 See the [Decision Atlas](decision-atlas.md) for the full comparison. [Delimited Lists](delimited-lists.md) and [Repeated Columns](repeated-columns.md) are migration starting points when individual members need references and constraints.
 
+```mermaid
+---
+title: Cardinality chooses the table shape before link identity does
+---
+flowchart TB
+  shape{"What does the extra row represent?"}:::accent
+  extension["One entity's optional extension: Table Split"]:::muted
+  dependent["A dependent with one owner: ordinary foreign key"]:::muted
+  link["Many-to-many link: Association Table"]:::accent
+  reference{"Link needs an independent stable reference?"}:::accent
+  pair["Natural Key: primary key is the endpoint pair"]:::accent
+  surrogate["Surrogate Key; keep pair UNIQUE for one current link"]:::muted
+  shape -->|Part of one entity| extension
+  shape -->|One-to-many| dependent
+  shape -->|Many-to-many| link
+  link --> reference
+  reference -->|No| pair
+  reference -->|Yes| surrogate
+```
+
+Link attributes do not determine cardinality or force a generated key. The one-current-membership rule requires pair uniqueness even when a surrogate identifies the membership.
+
 ## Structure
 
 ```mermaid
 ---
 title: The role belongs to the pair of project and person
 ---
-flowchart TB
-  membership["project_member: project_id + person_id PK"]:::accent
-  project["project: project_id PK"]:::muted
-  person["person: person_id PK"]:::muted
-  facts["member_role, joined_on"]:::warn
-  membership -->|many memberships to one project| project
-  membership -->|many memberships to one person| person
-  facts --> membership
+erDiagram
+  project ||--o{ project_member : has
+  person ||--o{ project_member : joins
+  project {
+    bigint project_id PK
+    text name
+  }
+  person {
+    bigint person_id PK
+    text name
+  }
+  project_member {
+    bigint project_id PK, FK
+    bigint person_id PK, FK
+    text member_role
+    date joined_on
+  }
+  class project_member accent
+  class project,person muted
 ```
 
 Each project and person can appear in many memberships. Each membership names exactly one of each. Neither endpoint is required to have any memberships; requiring at least one is an additional rule outside this schema.
@@ -137,6 +170,32 @@ SELECT count(*) FROM project_member;
 
 The final count is `0`; both people remain. IDs are supplied explicitly to keep the example focused on relationships; [Surrogate Key](surrogate-key.md) covers allocation.
 
+```mermaid
+---
+title: Removing a membership preserves its independent endpoints
+---
+stateDiagram-v2
+  direction TB
+  state "No membership for this pair" as Absent
+  state "Reader membership" as Reader
+  state "Editor membership" as Editor
+  [*] --> Absent
+  Absent --> Reader: Insert pair with reader role
+  Absent --> Editor: Insert pair with editor role
+  Reader --> Editor: Update member_role
+  Editor --> Reader: Update member_role
+  Reader --> Absent: Delete pair or cascade project deletion
+  Editor --> Absent: Delete pair or cascade project deletion
+  note right of Reader
+    Deleting the referenced person is rejected.
+    Deleting the pair preserves both endpoints.
+  end note
+  class Reader,Editor accent
+  class Absent muted
+```
+
+The state belongs to one project/person pair, so changing its role has no effect on the person's other memberships. Project deletion removes the link, while person deletion is blocked as long as a membership references it.
+
 ## Engine support
 
 - **PostgreSQL 18:** the composite primary key, foreign keys and reverse index implement the example directly.
@@ -150,6 +209,27 @@ The final count is `0`; both people remain. IDs are supplied explicitly to keep 
 A pre-insert lookup cannot settle competing joins. Let the primary key arbitrate: PostgreSQL's [uniqueness checks](https://www.postgresql.org/docs/18/index-unique-checks.html) wait for conflicting uncommitted writers and recheck their outcome. Ordinary read committed transactions suffice for the pair invariant.
 
 For a command meaning “ensure membership exists,” [`ON CONFLICT (project_id, person_id) DO NOTHING`](https://www.postgresql.org/docs/18/sql-insert.html) is a possible retry policy. Read the existing role if its value matters; ignoring a conflict does not prove it equals the requested role. For role edits, use a [Version Column](version-column.md) or a conditional update if overwriting a concurrent correction is unacceptable. A rule such as “every project has an editor” requires additional serialization and validation; neither endpoint foreign key enforces it.
+
+```mermaid
+---
+title: Pair uniqueness settles competing membership inserts
+---
+sequenceDiagram
+  participant A as Session A
+  participant DB as PostgreSQL
+  participant B as Session B
+  A->>DB: BEGIN, then insert (10, 1, editor)
+  DB-->>A: Membership inserted
+  B->>DB: BEGIN, then insert (10, 1, reader) ON CONFLICT DO NOTHING
+  Note over DB,B: Unique check waits for A's pair
+  A->>DB: COMMIT
+  DB-->>B: Conflict, no row inserted
+  B->>DB: Read existing membership (10, 1)
+  DB-->>B: member_role = editor
+  B->>DB: COMMIT
+```
+
+The pair can exist only once, but ignoring the second insert does not apply its requested role. B must inspect the existing row if “reader” was part of the command's meaning.
 
 ## Migration
 

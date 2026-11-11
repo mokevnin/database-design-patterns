@@ -44,18 +44,49 @@ PostgreSQL [`bigint`](https://www.postgresql.org/docs/18/datatype-numeric.html) 
 
 Use the [Decision Atlas](decision-atlas.md) for the full family comparison. Avoid [Mandatory Surrogates](mandatory-surrogates.md): a relationship identified by two existing keys may need only their composite primary key.
 
+```mermaid
+---
+title: Choose reference identity before choosing its generator
+---
+flowchart TB
+  business{"Short, mandatory, stable business key?"}:::accent
+  natural["Natural Key"]:::muted
+  surrogate["Surrogate Key; retain business uniqueness"]:::accent
+  early{"Need IDs before insertion or across databases?"}:::accent
+  integer["Bigint identity"]:::muted
+  time{"Time locality useful and disclosure acceptable?"}:::accent
+  ordered["Time-Ordered Identifier"]:::accent
+  random["Random UUIDv4"]:::muted
+  business -->|Yes| natural
+  business -->|No| surrogate
+  surrogate --> early
+  early -->|No| integer
+  early -->|Yes| time
+  time -->|Yes| ordered
+  time -->|No| random
+```
+
+The first branch chooses the reference contract; the later branches choose an allocator for a generated key. Business uniqueness remains necessary whichever generator you select.
+
 ## Structure
 
 ```mermaid
 ---
 title: Customer numbering changes while order references stay fixed
 ---
-flowchart TB
-  number["customer_number: UNIQUE business value"]:::warn
-  customer["customer: customer_id PK"]:::accent
-  orders["customer_order: order_id PK, customer_id FK"]:::muted
-  number --> customer
-  orders -->|many orders to one customer| customer
+erDiagram
+  customer ||--o{ customer_order : receives
+  customer {
+    bigint customer_id PK
+    text customer_number UK
+    text display_name
+  }
+  customer_order {
+    bigint order_id PK
+    bigint customer_id FK
+  }
+  class customer accent
+  class customer_order muted
 ```
 
 The order stores the generated key. The customer row stores both the stable reference target and the changeable number. Uniqueness of the number is an independent invariant.
@@ -133,6 +164,23 @@ CREATE TABLE ordered_customer (
 
 For application generation, send an explicit UUID instead of using the default. Do not change the identity of an existing row each time you retry a request.
 
+```mermaid
+---
+title: UUID generation changes the key type without changing its role
+---
+erDiagram
+  random_customer {
+    uuid customer_id PK "default uuidv4()"
+  }
+  ordered_customer {
+    uuid customer_id PK "default uuidv7()"
+  }
+  class random_customer muted
+  class ordered_customer accent
+```
+
+These are independent alternative tables, each with a UUID primary key. A real conversion must also change every referencing column to the matching type.
+
 ## Engine support
 
 - **PostgreSQL 18:** use the identity and UUID definitions above. An identity is an allocator plus a constraint, not a business numbering service.
@@ -147,11 +195,58 @@ Use the allocator and constraints at the normal transaction isolation level; do 
 
 Two concurrent registrations can both pass an application pre-check. PostgreSQL's [unique-index conflict checking](https://www.postgresql.org/docs/18/index-unique-checks.html) waits for an uncommitted conflicting writer and rechecks its outcome. Handle the business-key conflict explicitly. After an uncertain commit, resolve the original request by its business key or an [Idempotency Record](idempotency-record.md); generating a fresh surrogate is not a retry strategy.
 
+```mermaid
+---
+title: Different generated keys can still collide on one customer number
+---
+sequenceDiagram
+  participant A as Session A
+  participant DB as PostgreSQL
+  participant B as Session B
+  A->>DB: BEGIN, then insert customer number C-204
+  DB-->>A: Allocate customer_id 1, insert succeeds
+  B->>DB: BEGIN, then insert customer number C-204
+  Note over DB,B: Allocate customer_id 2, unique check waits for A
+  A->>DB: COMMIT
+  DB-->>B: 23505 on customer_number_key
+  B->>DB: ROLLBACK
+  Note over DB: Allocated value 2 is not reclaimed
+```
+
+The allocator prevents an ID collision, while the business-key constraint prevents duplicate registration. The failed registration can leave a sequence gap.
+
 ## Migration
 
 Keep the existing business key unique. Add a nullable surrogate column without a table-wide generated default, arrange allocation for new rows, and backfill existing rows in bounded batches. Build its unique index [concurrently](https://www.postgresql.org/docs/18/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY). Add surrogate columns to children, write both references, and backfill through the old key. Add new foreign keys as [`NOT VALID`, then validate them](https://www.postgresql.org/docs/18/sql-altertable.html). Plan short DDL lock windows and retry lock acquisition; this is not a lock-free conversion.
 
 Switch reads after checking that old and new references agree. Delay removing old child columns until all writers have changed. To back out before removal, switch reads and writes back to the retained business references. When merging databases with integer surrogates, build an explicit old-to-new ID map and apply it to every child; copying the integers unchanged can identify the wrong customer.
+
+```mermaid
+---
+title: Preserve the old reference path until the surrogate path is validated
+---
+stateDiagram-v2
+  direction TB
+  state "Business references authoritative" as Old
+  state "Parent IDs allocated and backfilled" as Parent
+  state "Child references dual-written and backfilled" as Dual
+  state "New uniqueness and foreign keys validated" as Valid
+  state "Reads use surrogate references" as Switched
+  state "Old child columns removed" as Contracted
+  [*] --> Old
+  Old --> Parent: Keep business uniqueness
+  Parent --> Dual: Build parent uniqueness
+  Dual --> Valid: Compare both reference paths
+  Valid --> Switched: Switch readers
+  Switched --> Old: Roll back while old columns remain
+  Switched --> Contracted: All writers migrated
+  Contracted --> [*]
+  class Parent,Dual,Valid,Switched accent
+  class Contracted warn
+  class Old muted
+```
+
+The retained business references provide the rollback path during the overlap. Removing them ends that direct rollback route.
 
 ## Anti-patterns and common mistakes
 

@@ -50,19 +50,23 @@ With lexicographic ranks, use the generator's comparison rules end to end. [Roci
 ---
 title: Item identity survives moves and position renumbering
 ---
-flowchart TB
-  owner["playlist: playlist_id PK; lock target"]:::accent
-  first["item 1: position 1024"]:::muted
-  inserted["item 4: position 1536"]:::accent
-  second["item 2: position 2048"]:::muted
-  rule["UNIQUE playlist_id + position"]:::warn
-  owner --> first
-  owner --> inserted
-  owner --> second
-  rule -.-> inserted
+erDiagram
+  playlist ||--o{ playlist_item : owns
+  playlist {
+    bigint playlist_id PK
+    text name
+  }
+  playlist_item {
+    bigint item_id PK
+    bigint playlist_id FK, UK "unique with position"
+    text title
+    bigint position UK "unique within playlist"
+  }
+  class playlist accent
+  class playlist_item muted
 ```
 
-The arrows show ownership, not stored next pointers. Sorting the three positions puts item `4` between items `1` and `2`. Its ID remains `4` after a later rebalance.
+The relationship shows ownership, while the composite unique constraint scopes positions to one playlist. Moving or renumbering an item changes its position without changing its primary key.
 
 ## Tables and invariants
 
@@ -143,6 +147,20 @@ COMMIT;
 
 The positions are `1024, 2048, 3072, 4096` in the same item order. PostgreSQL supports [deferring unique checks](https://www.postgresql.org/docs/18/sql-createtable.html); the committed result must still be unique. This protects a swap or renumber from transient duplicates without accepting final ties. This deferrable constraint cannot be an `ON CONFLICT` arbiter, so do not treat rank collisions as upserts.
 
+```mermaid
+---
+title: Rebalancing changes positions while preserving item order and identity
+---
+block-beta
+  columns 5
+  before["Before"] a["1: Intro\n1024"] b["3: Credits\n1280"] c["4: Setup\n1536"] d["2: Demo\n2048"]
+  after["After"] e["1: Intro\n1024"] f["3: Credits\n2048"] g["4: Setup\n3072"] h["2: Demo\n4096"]
+  class a,b,c,d muted
+  class e,f,g,h accent
+```
+
+Rebalancing preserves the item order `1, 3, 4, 2` and restores spacing of 1024 between positions. These blocks show sorted rows before and after the SQL update, not stored neighbor pointers.
+
 ```sql
 UPDATE playlist_item SET position = 1024
 WHERE playlist_id = 1 AND item_id = 2;
@@ -163,6 +181,54 @@ Outside the deferred transaction, PostgreSQL 18.6 rejects this immediately with 
 At PostgreSQL read committed isolation, acquire the [parent row lock](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-ROWS) before the statement that reads positions, and keep it until commit. Every inserting, deleting, moving and rebalancing writer must follow this protocol. Locking only existing items misses an empty collection and does not establish one common serialization point. When moving between collections, lock both parents in increasing ID order before checking either list.
 
 Serialization prevents concurrent calculations from using the same old gap. It does not tell you whether a user saw an obsolete list. Add a collection-level [Version Column](version-column.md) and reject a stale expected version if that distinction matters. Retry failed transactions from the beginning, re-reading neighbors. After an uncertain commit, read the item's current placement or use an [Idempotency Record](idempotency-record.md); blindly repeating “move one place left” can move twice. PostgreSQL's [transaction atomicity](https://www.postgresql.org/docs/18/tutorial-transactions.html) means a failed rebalance leaves no committed half-renumbered list.
+
+```mermaid
+---
+title: The parent lock prevents two editors from calculating the same old gap
+---
+sequenceDiagram
+  participant A as Session A
+  participant DB as PostgreSQL
+  participant B as Session B
+  A->>DB: BEGIN, then lock playlist 1 FOR UPDATE
+  DB-->>A: Parent lock granted
+  B->>DB: BEGIN, then lock playlist 1 FOR UPDATE
+  Note over DB,B: Wait before reading any positions
+  A->>DB: Read neighbors at 1024 and 2048
+  A->>DB: Insert item 4 at 1536, then COMMIT
+  DB-->>B: Parent lock granted
+  B->>DB: Read current items and validate submitted neighbors
+  DB-->>B: Item 4 now lies between the old neighbors
+  B->>B: Reject stale move or explicitly reinterpret it
+  B->>DB: End transaction
+```
+
+B sees A's insertion because it reads positions after acquiring the lock. Serialization provides current data, while the application must still decide how to handle the stale neighbor request.
+
+```mermaid
+---
+title: Exhausted gaps require a rebalance inside the same editing transaction
+---
+flowchart TB
+  lock["Begin; lock playlist before reading ranks"]:::accent
+  neighbors["Read current neighbors; validate requested move"]:::accent
+  fits{"Free integer fits within bigint bounds?"}:::accent
+  defer["Defer playlist_item_position_key"]:::warn
+  rebalance["Renumber in current order with spacing 1024"]:::accent
+  reread["Re-read ranks; calculate a free position"]:::accent
+  write["Insert or move item; keep item_id unchanged"]:::accent
+  commit["Commit; require final positions to be unique"]:::muted
+  lock --> neighbors
+  neighbors --> fits
+  fits -->|Yes| write
+  fits -->|No| defer
+  defer --> rebalance
+  rebalance --> reread
+  reread --> write
+  write --> commit
+```
+
+Keep the owner lock throughout renumbering and the requested edit so another writer cannot consume the newly opened gap. Deferral permits temporary collisions, but the final committed positions must still be distinct and within bounds.
 
 ## Migration
 

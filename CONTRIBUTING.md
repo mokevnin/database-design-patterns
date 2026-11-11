@@ -19,7 +19,7 @@ The book has no margin notes or comment threads: an addition becomes part of the
 1. Decide where it belongs. A new step, variant, consequence, or pitfall of the same technique goes into the matching template section of that chapter (`Implementation`, `Consequences and trade-offs`, `Anti-patterns and common mistakes`, and so on). If the idea works on its own and is useful outside this pattern, it is a candidate for a separate chapter — add it to [CANDIDATES.md](CANDIDATES.md) and link it from `Related patterns` instead.
 2. For anything larger than a wording fix, open an issue first and describe the addition and the experience behind it, so the placement can be agreed before you write.
 3. Edit `book/en/<slug>.md` first. Keep the template headings; extend a section rather than adding a new one.
-4. Translations are deferred for now (see below). Once `ru` and `es` editions exist, update them in the same PR if you can and refresh `source_rev` in every translation you touch.
+4. Update the `ru` translation in the same PR if you can and refresh `source_rev` in every translation you touch. The `es` edition is deferred (see below).
 
 Anti-patterns go into the "Anti-patterns" group of `SUMMARY.md` and use `templates/<locale>/anti-pattern.md`. Name the harmful condition, say when the original choice is defensible, and give the source's term (for example, Karwin's) under "Also known as".
 
@@ -41,7 +41,7 @@ The website's meta description and Open Graph description come from the chapter'
 
 ## Translation
 
-- The canonical locale is `en` (`language` in `book/book.json`). A pattern is written in English first. For now the book is written in `en` only; `ru` and `es` are translated later in a separate pass.
+- The canonical locale is `en` (`language` in `book/book.json`). A pattern is written in English first; the `ru` edition is translated from it. The `es` translation is deferred until a separate pass.
 - To translate, copy `book/en/<slug>.md` to `book/<locale>/<slug>.md`, translate the text, and add a link to `book/<locale>/SUMMARY.md` in the same group. Use the matching template under `templates/<locale>/` for the localized headings.
 - In the translation's front matter set `source_rev` — the git SHA of the en chapter at the time of translating, so staleness can be tracked:
 
@@ -53,7 +53,7 @@ The website's meta description and Open Graph description come from the chapter'
 
 - Do not hard-wrap Markdown prose to a fixed column width. Keep each paragraph, list item, and blockquote on one physical source line; use line breaks only for intentional Markdown structure.
 - Inside `book/<locale>/` chapters are a flat list — no group folders.
-- Once a locale's translation is complete, its set of `<slug>.md` files and `SUMMARY.md` structure should match the canonical English edition. Until translation begins, leave the deferred `ru` and `es` editions unchanged.
+- Once a locale's translation is complete, its set of `<slug>.md` files and `SUMMARY.md` structure should match the canonical English edition. Leave the deferred `es` edition unchanged until its translation begins.
 - Assets are shared in `book/assets/` — do not duplicate images per locale.
 - All text outside the language folders (`book/<locale>/`) and the localized templates is in English.
 
@@ -61,6 +61,6 @@ For environment setup and commit conventions, see [AGENTS.md](AGENTS.md).
 
 ## Reader-facing candidates
 
-`CANDIDATES.md` is the authoritative backlog. Keep the brief candidate list in `book/en/candidates.md` synchronized (the `ru` and `es` lists follow when those editions are translated) when a candidate is added, renamed, accepted, completed, or rejected. Include rows with status `candidate`; once a topic leaves that status, remove it from the brief list and update its existing discussion with the outcome and the chapter link, if available.
+`CANDIDATES.md` is the authoritative backlog. Keep the brief candidate list in `book/en/candidates.md` synchronized (keep the `ru` list synchronized too; the `es` list follows when that edition is translated) when a candidate is added, renamed, accepted, completed, or rejected. Include rows with status `candidate`; once a topic leaves that status, remove it from the brief list and update its existing discussion with the outcome and the chapter link, if available.
 
 Reader discussions use GitHub Issues with the title `[Candidate] <slug>`. Search open and closed issues before creating one; reuse the existing thread to preserve votes. Readers vote with a thumbs-up reaction on the opening post. Keep the slug consistent across locales so all three editions link to the same discussion. The issue template supplies the common format; votes inform editorial priority rather than automatically accepting chapters.

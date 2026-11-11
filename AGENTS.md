@@ -52,7 +52,7 @@ Operating guide for agents (and humans) working in this repository.
 ## Structure conventions
 
 - Chapter titles are short GoF-style noun names, 1–3 words per locale; the source's long name goes under «Также известен как».
-- For now chapters are written in `en` only, each with its `SUMMARY.md` entry. The `ru` and `es` editions are translated later, in a separate pass; until then leave their folders, `SUMMARY.md` and `candidates.md` untouched.
+- Write chapters in `en` first, each with its `SUMMARY.md` entry, and maintain the `ru` translation with matching files, navigation and `source_rev`. The `es` edition is deferred to a separate translation pass; until then leave its folder, `SUMMARY.md` and `candidates.md` untouched.
 - Patterns are flat files `book/<locale>/<slug>.md`; grouping lives only in `book/<locale>/SUMMARY.md`.
 - Shared binary assets and code samples in `book/assets/<slug>/`, referenced via `../assets/<slug>/...`. Diagrams are not assets — see above.
 - Canonical locale is `en`: write a pattern in English first; translations follow from it.

@@ -8,7 +8,7 @@ related: [table-partitioning, table-split]
 
 ## Intent
 
-Expand and contract changes a schema in a series of backward-compatible steps, so old and new versions of the application work at the same time and no deploy needs downtime. You first expand — add the new column or table — then write to both and backfill, switch reads, and only then contract by removing the old structure. The chapter walks through renaming a column, splitting a table and changing a type this way, and shows how locks taken by DDL statements can still stop production when a step is done carelessly. PostgreSQL [documents DDL lock requirements](https://www.postgresql.org/docs/18/sql-altertable.html), so this compatibility sequence does not itself guarantee uninterrupted availability.
+Expand and contract changes a schema in a series of backward-compatible steps, allowing old and new application versions to coexist during migration without requiring all clients to switch at once. You first expand — add the new column or table — then write to both and backfill, switch reads, and only then contract by removing the old structure. The chapter walks through renaming a column, splitting a table and changing a type this way, and shows how locks taken by DDL statements can still stop production when a step is done carelessly. PostgreSQL [documents DDL lock requirements](https://www.postgresql.org/docs/18/sql-altertable.html), so this compatibility sequence does not itself guarantee uninterrupted availability.
 
 ## Also known as
 

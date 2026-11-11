@@ -8,7 +8,7 @@ related: [transactional-outbox, queue-table, double-entry-ledger]
 
 ## Intent
 
-An idempotency record makes a retried operation safe: the client sends a unique key with the request, and the server stores the key and the result in the same transaction as the effect. A repeated request with the same key returns the stored result instead of charging the card twice. The chapter shows the table, the unique constraint that settles races between concurrent retries, how long to keep keys, how to detect a key reused for a different request, and the consumer-side variant that records processed message IDs.
+An idempotency record makes a retried database operation safe: the client sends a unique key with the request, and the server stores the key and the result in the same transaction as the local effect. A repeated request with the same key and payload returns the stored result instead of debiting the local balance twice. The chapter shows the table, the unique constraint that settles races between concurrent retries, how long to keep keys, how to detect a key reused for a different request, and the consumer-side variant that records processed message IDs.
 
 ## Also known as
 
@@ -24,7 +24,7 @@ A key stored after committing the debit leaves the same crash gap. A key stored 
 
 Scope the key by authenticated account and operation contract. Store the normalized request and final response with that key, committing them in the same transaction as the local business effect. Let a primary key arbitrate concurrent attempts. The winner performs the effect and saves the result; the loser compares requests and returns the original saved result or rejects the mismatch.
 
-The example debits a local balance in integer units; it does not call a card processor. The opening's card-charge goal needs additional cooperation when the effect is outside your database: send a stable provider idempotency key, retain recovery state, or stage a command in a [Transactional Outbox](transactional-outbox.md). A local record cannot roll back an external charge. [Brandur Leach's implementation](https://brandur.org/idempotency-keys) separates local atomic phases from foreign mutations for precisely that boundary.
+The example debits a local balance in integer units. External effects, such as charging a card through a payment provider, need additional cooperation: send a stable provider idempotency key, retain recovery state, or stage a command in a [Transactional Outbox](transactional-outbox.md). A local record cannot roll back an external charge. [Brandur Leach's implementation](https://brandur.org/idempotency-keys) separates local atomic phases from foreign mutations for precisely that boundary.
 
 ## Alternatives and selection
 

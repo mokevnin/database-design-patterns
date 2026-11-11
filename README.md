@@ -20,7 +20,7 @@ book/                 — the book root (Honkit)
 templates/<locale>/   — localized pattern.md and anti-pattern.md skeletons
 ```
 
-Patterns are grouped by area; **anti-patterns** live in a separate general chapter. There are no group folders in the tree: patterns are flat files, convenient to read right on GitHub. Grouping and order come from each locale's `SUMMARY.md`. Assets are shared in `book/assets/` and referenced via `../assets/<slug>/...`.
+Patterns are grouped by area; **anti-patterns** have individual chapters grouped in a separate section. There are no group folders in the tree: patterns are flat files, convenient to read right on GitHub. Grouping and order come from each locale's `SUMMARY.md`. Assets are shared in `book/assets/` and referenced via `../assets/<slug>/...`.
 
 One pattern = a file `book/<locale>/<slug>.md`. The file name (`<slug>`) is the same across all locales.
 

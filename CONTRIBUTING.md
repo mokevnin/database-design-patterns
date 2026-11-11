@@ -50,7 +50,7 @@ source_rev:              # for NON-canonical locales only (see below)
 
 - Do not hard-wrap Markdown prose to a fixed column width. Keep each paragraph, list item, and blockquote on one physical source line; use line breaks only for intentional Markdown structure.
 - Inside `book/<locale>/` chapters are a flat list — no group folders.
-- The set of `<slug>.md` files and the `SUMMARY.md` structure should match across locales.
+- Once a locale's translation is complete, its set of `<slug>.md` files and `SUMMARY.md` structure should match the canonical English edition. Until translation begins, leave the deferred `ru` and `es` editions unchanged.
 - Assets are shared in `book/assets/` — do not duplicate images per locale.
 - All text outside the language folders (`book/<locale>/`) and the localized templates is in English.
 

@@ -8,7 +8,7 @@ related: [effective-dating, bitemporal-table, audit-log, status-history]
 
 ## Intent
 
-A history table keeps every previous version of a row together with the period during which it was current, so you can ask what a record looked like at any past moment. The chapter shows both ways to maintain it: by hand, with triggers that copy the old row on every update and delete, and with native SQL:2011 system versioning in SQL Server, MariaDB and Db2, where the database maintains the period columns and answers `FOR SYSTEM_TIME AS OF` queries. It covers what history does not record, such as who made the change, and how to keep it from growing without bound. The standard model is described by [Kulkarni and Michels](https://sigmodrecord.org/?download_id=3338&smd_process_download=1), with native implementations documented by [Microsoft](https://learn.microsoft.com/en-us/sql/relational-databases/tables/temporal/overview?view=sql-server-ver17), [MariaDB](https://mariadb.com/docs/server/reference/sql-structure/temporal-tables/system-versioned-tables) and [IBM](https://www.ibm.com/docs/en/db2-for-zos/13.0.0?topic=tables-creating-bitemporal).
+A history table retains previous versions of a row together with their recording periods, so you can query the recorded value at a past instant within the retained history. The meaning of that instant depends on the recording clock; the PostgreSQL example uses processing time. The chapter shows both ways to maintain history: by hand, with triggers that copy the old row on every update and delete, and with native SQL:2011 system versioning in SQL Server, MariaDB and Db2, where the database maintains the period columns and answers `FOR SYSTEM_TIME AS OF` queries. It covers what history does not record, such as who made the change, and how to keep it from growing without bound. The standard model is described by [Kulkarni and Michels](https://sigmodrecord.org/?download_id=3338&smd_process_download=1), with native implementations documented by [Microsoft](https://learn.microsoft.com/en-us/sql/relational-databases/tables/temporal/overview?view=sql-server-ver17), [MariaDB](https://mariadb.com/docs/server/reference/sql-structure/temporal-tables/system-versioned-tables) and [IBM](https://www.ibm.com/docs/en/db2-for-zos/13.0.0?topic=tables-creating-bitemporal).
 
 ## Also known as
 
@@ -16,7 +16,7 @@ System-versioned table when the engine maintains the versions. Fowler's [Tempora
 
 ## Problem
 
-You overwrite an item's label when an editor publishes it. A week later, support asks which label a customer saw before publication. The current row cannot answer, and a list of “item updated” actions cannot answer unless it also retained the values you need. Keeping a dated copy before each change makes this a state query instead of a reconstruction exercise.
+You overwrite an item's label when an editor publishes it. A week later, support asks which label was recorded before that change. The current row cannot answer, and a list of “item updated” actions cannot answer unless it also retained the values you need. Keeping a dated copy before each change makes this a state query instead of a reconstruction exercise.
 
 Decide what the date means. An editor can enter a correction today for a mistake made last month. This chapter retains when you recorded each value. It does not make the correction true in the business last month, and it does not establish the exact time a transaction became visible to another session. Those are different contracts.
 

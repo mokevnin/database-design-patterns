@@ -1,5 +1,5 @@
-amends "package://github.com/jdx/hk/releases/download/v2.11.1/hk@2.11.1#/Config.pkl"
-import "package://github.com/jdx/hk/releases/download/v2.11.1/hk@2.11.1#/Builtins.pkl"
+amends "package://github.com/jdx/hk/releases/download/v2.12.0/hk@2.12.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v2.12.0/hk@2.12.0#/Builtins.pkl"
 
 // Vendored skills, pinned by hash in skills-lock.json; never edited here.
 exclude = List(".agents/skills/**", ".claude/skills/**")
@@ -14,6 +14,10 @@ local checks = new Mapping<String, Step> {
     ["oxfmt"] = (Builtins.oxfmt) {
         glob = List("*.js", "*.json", "*.css", "*.yml", "*.yaml", "*.toml")
         exclude = List("pnpm-lock.yaml", "skills-lock.json")
+    }
+    ["search"] {
+        glob = List("*.js", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "patches/**")
+        check = "node --test tests/*.test.js"
     }
     ["syncpack"] {
         glob = List("package.json", "pnpm-workspace.yaml", ".syncpackrc.json")

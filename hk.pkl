@@ -16,7 +16,7 @@ local checks = new Mapping<String, Step> {
         exclude = List("pnpm-lock.yaml", "skills-lock.json")
     }
     ["search"] {
-        glob = List("*.js", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "patches/**")
+        glob = List("*.js", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml")
         check = "node --test tests/*.test.js"
     }
     ["syncpack"] {

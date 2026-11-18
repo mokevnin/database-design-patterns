@@ -270,3 +270,4 @@ You can stop issuing new handles during rollback, but continue resolving handles
 - [Time-Ordered Identifier](time-ordered-identifier.md) explains the generation time you disclose by exposing ordered IDs.
 - [Idempotency Record](idempotency-record.md) separates retry identity from object identity.
 - [Mandatory Surrogates](mandatory-surrogates.md) challenges IDs that have no independent purpose.
+- [Hashed Secret](hashed-secret.md) covers values that grant access, such as API keys, which are stored only as digests.

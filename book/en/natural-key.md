@@ -246,4 +246,5 @@ The logical switch does not require dropping the surrogate primary key. Keeping 
 - [Association Table](association-table.md) uses composite identity for relationships.
 - [Time-Ordered Identifier](time-ordered-identifier.md) is an option when you replace the natural primary key with a generated one.
 - [Public Identifier](public-identifier.md) lets you avoid publishing a sensitive business key.
+- [Canonical Value](canonical-value.md) keeps a typed business identifier unique when people enter it in different cases or Unicode forms.
 - [Mandatory Surrogates](mandatory-surrogates.md) describes the cost of adding IDs without preserving business identity.

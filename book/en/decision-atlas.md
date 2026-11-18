@@ -60,6 +60,8 @@ What identifies the row to its dependents, and what may clients see? Choose the 
 | [Natural Key](natural-key.md) | A short, mandatory business tuple has settled scope and manageable corrections | Every dependent carries the complete tuple | Corrections or scope expansion affect references; Oracle has no `ON UPDATE CASCADE` |
 | [Time-Ordered Identifier](time-ordered-identifier.md) | Generate before insertion or across writers, with useful measured index locality | A surrogate implementation; PK still rejects collisions | Reveals generation time; ordering is not commit order; PostgreSQL 18 supplies `uuidv7()` |
 | [Public Identifier](public-identifier.md) | Published references need a distinct stability or disclosure contract | Complement to either internal key; separate unique handle | Maintain resolution and any rotation/alias policy; random handles do not replace authorization |
+| [Canonical Value](canonical-value.md) | People type the identifier, and some spellings must count as the same | Alternate key on a derived, normalized form; the entered form is kept | One immutable rule; changing it needs a collision report and migration |
+| [Hashed Secret](hashed-secret.md) | The value authenticates its holder and must be useless when read | Store a verifier: slow salted hash for passwords, unique digest for random tokens | Cannot show a secret again; hashing belongs in the application |
 
 ```mermaid
 ---
@@ -88,6 +90,8 @@ flowchart TB
 ```
 
 A public handle can accompany a natural or surrogate key. Choosing UUIDv7 does not decide whether a surrogate is needed, and its locality is a workload question rather than a throughput guarantee.
+
+Two identity questions sit beside the flowchart rather than inside it. An identifier that people type needs one comparison rule, enforced on a [Canonical Value](canonical-value.md) beside whichever key references the row. A value that proves who its holder is, such as a password or an API key, is stored only as a [Hashed Secret](hashed-secret.md) and never serves as a reference key.
 
 ## Relationships
 

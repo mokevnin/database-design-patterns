@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [surrogate-key, time-ordered-identifier, public-identifier, association-table, mandatory-surrogates]
-source_rev: 0d5af2dffd0cbe2d7070b6d88b9d3d756c08a6ef
+source_rev: 46451149486b0c2c4a9d3e832c5d3d1d6e88a788
 ---
 
 # Естественный ключ
@@ -247,4 +247,5 @@ stateDiagram-v2
 - [Таблица связей](association-table.md) использует составную идентичность отношений.
 - [Упорядоченный идентификатор](time-ordered-identifier.md) — вариант замены естественного первичного ключа генерируемым.
 - [Публичный идентификатор](public-identifier.md) позволяет не публиковать чувствительный бизнес-ключ.
+- [Каноническое значение](canonical-value.md) сохраняет уникальность вводимого бизнес-идентификатора, когда люди пишут его в разном регистре или разных формах Unicode.
 - [Обязательные суррогаты](mandatory-surrogates.md) описывает цену добавления ID без сохранения бизнес-идентичности.

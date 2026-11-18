@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [surrogate-key, natural-key, time-ordered-identifier, mandatory-surrogates]
-source_rev: 0d5af2dffd0cbe2d7070b6d88b9d3d756c08a6ef
+source_rev: 46451149486b0c2c4a9d3e832c5d3d1d6e88a788
 ---
 
 # Публичный идентификатор
@@ -271,3 +271,4 @@ stateDiagram-v2
 - [Упорядоченный идентификатор](time-ordered-identifier.md) объясняет, какое время раскрывается при публикации упорядоченных ID.
 - [Запись идемпотентности](idempotency-record.md) отделяет идентичность повтора от идентичности объекта.
 - [Обязательные суррогаты](mandatory-surrogates.md) ставит под сомнение ID без самостоятельной цели.
+- [Хешированный секрет](hashed-secret.md) описывает значения, дающие доступ, например API-ключи, которые хранятся только в виде дайджестов.

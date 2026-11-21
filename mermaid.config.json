@@ -38,7 +38,12 @@
     "pieStrokeColor": "#4a6fa5",
     "pieOuterStrokeColor": "#4a6fa5",
     "pieSectionTextColor": "#1a2b3c",
-    "pieLegendTextColor": "#1a2b3c"
+    "pieLegendTextColor": "#1a2b3c",
+    "activeTaskBkgColor": "#f6f1e7",
+    "activeTaskBorderColor": "#a5764a",
+    "critBkgColor": "#f9eded",
+    "critBorderColor": "#a54a4a",
+    "vertLineColor": "#1a2b3c"
   },
   "flowchart": {
     "htmlLabels": false,

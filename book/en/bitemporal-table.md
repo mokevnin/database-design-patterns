@@ -180,6 +180,30 @@ flowchart TB
 
 At a knowledge cutoff before `R`, you select the unsplit old assertion. At `R` and later, you select the appropriate new business piece. The shared boundary makes the change atomic in the model.
 
+```mermaid
+---
+title: Each knowledge state has its own business timeline, so February 20 reads 100 before R and 120 from R
+config:
+  gantt:
+    useWidth: 900
+    fontSize: 16
+    sectionFontSize: 16
+    leftPadding: 150
+---
+gantt
+    dateFormat YYYY-MM-DD
+    axisFormat %b %d
+    tickInterval 1month
+    section Known before R
+    100 :old, 2026-01-01, 2026-04-01
+    section Known from R
+    100 :left, 2026-01-01, 2026-02-15
+    120 :active, right, 2026-02-15, 2026-04-01
+    February 20 :vert, feb20, 2026-02-20, 0d
+```
+
+The horizontal axis is business time; each section is one stretch of recorded knowledge. Read straight down from February 20: the upper section, the belief the March report used, still answers 100, and the lower one answers 120. The two sections overlap in business time but not in knowledge time, so their rectangles do not intersect and the exclusion constraint accepts both.
+
 A fourth assertion that competes with existing knowledge is invalid:
 
 ```sql

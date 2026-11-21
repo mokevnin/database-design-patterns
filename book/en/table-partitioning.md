@@ -195,6 +195,21 @@ ALTER TABLE activity_event ATTACH PARTITION activity_event_2026_11
 
 Only drop the detached table after your archive and recovery requirements are satisfied. If other tables reference retained event keys, their dependency and retention policy must be resolved before removal; this lab intentionally has no incoming event foreign keys.
 
+```mermaid
+---
+title: The parent sees only attached months, and a missing month rejects writes
+---
+block-beta
+  columns 4
+  parent["activity_event (parent)"]:4
+  nov["2026-11\ndetached"] dec["2026-12\nattached"] jan["2027-01\nattached early"] feb["2027-02\nmissing"]
+  class parent,dec,jan accent
+  class nov muted
+  class feb warn
+```
+
+Read the row under the parent: after the retention step only December and January are attached, so a parent query sees just those months, while November keeps its rows under its own name until you drop it. The February gap is deliberate. Without a default partition, its first insert fails with SQLSTATE `23514` instead of piling up unnoticed, which is why you create partitions ahead of writes and alert on the covered horizon.
+
 ## Engine support
 
 - **PostgreSQL 18:** parent primary/unique constraints require all partition-key columns and cannot use expression partition keys for that guarantee. Review the [declarative limitations](https://www.postgresql.org/docs/18/ddl-partitioning.html#DDL-PARTITIONING-DECLARATIVE-LIMITATIONS) before choosing the key.

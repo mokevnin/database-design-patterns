@@ -51,7 +51,12 @@
     "quadrantYAxisTextFill": "#dde6f2",
     "quadrantTitleFill": "#dde6f2",
     "quadrantInternalBorderStrokeFill": "#8b99aa",
-    "quadrantExternalBorderStrokeFill": "#7fa2d6"
+    "quadrantExternalBorderStrokeFill": "#7fa2d6",
+    "activeTaskBkgColor": "#3a3124",
+    "activeTaskBorderColor": "#d4a574",
+    "critBkgColor": "#3d2627",
+    "critBorderColor": "#d98080",
+    "vertLineColor": "#dde6f2"
   },
   "themeCSS": ".accent rect, .accent polygon, .accent path { fill: #3a3124 !important; stroke: #d4a574 !important; } .warn rect, .warn polygon, .warn path { fill: #3d2627 !important; stroke: #d98080 !important; } .muted rect, .muted polygon, .muted path { fill: #2a2e36 !important; stroke: #8b99aa !important; } .cluster rect { stroke-dasharray: 6 4 !important; stroke: #8b99aa !important; } .cluster-label text { fill: #8b99aa !important; } .nodes .node[id^=\"node-\"] rect { fill: #7fa2d6 !important; stroke: #7fa2d6 !important; } .node-labels text { fill: #dde6f2 !important; } text.actor { stroke: none !important; fill: #dde6f2 !important; } text { fill: #dde6f2; } .link { mix-blend-mode: normal !important; }",
   "sankey": {

@@ -4,4 +4,4 @@ Un catálogo de patrones de diseño de bases de datos al estilo de la «Banda de
 
 Los patrones se agrupan por áreas de trabajo. El [índice](SUMMARY.md) define el orden de los capítulos y sirve como navegación del libro.
 
-El libro fue creado por [Kirill Mokevnin](https://github.com/mokevnin).
+El libro fue creado por [Kirill Mokevnin](https://github.com/mokevnin) con el apoyo de [Hexlet](https://hexlet.io).

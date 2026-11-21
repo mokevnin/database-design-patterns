@@ -4,4 +4,4 @@ A catalog of database design patterns in the spirit of the "Gang of Four". The p
 
 Patterns are grouped by area of work. The [table of contents](SUMMARY.md) sets the order of the chapters and serves as the book's navigation.
 
-The book was created by [Kirill Mokevnin](https://github.com/mokevnin).
+The book was created by [Kirill Mokevnin](https://github.com/mokevnin) with the support of [Hexlet](https://hexlet.io).

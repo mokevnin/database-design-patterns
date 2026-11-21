@@ -1,6 +1,6 @@
 # Database Design Patterns
 
-A catalog of **database design patterns** in the spirit of the "Gang of Four" (GoF): relational schemas for application databases, with PostgreSQL as the reference engine. Document, key-value and analytics modeling are separate books. It is a book built from markdown with [Honkit](https://github.com/honkit/honkit) (a GitBook fork), with print (PDF/EPUB) in mind.
+A catalog of **database design patterns** in the spirit of the "Gang of Four" (GoF): relational schemas for application databases, with PostgreSQL as the reference engine. Document, key-value and analytics modeling are separate books. It is a book built from markdown with [VitePress](https://vitepress.dev/).
 
 📖 **Online:** <https://mokevnin.github.io/database-design-patterns/>
 
@@ -9,9 +9,9 @@ A catalog of **database design patterns** in the spirit of the "Gang of Four" (G
 ## Repository layout
 
 ```text
-book/                 — the book root (Honkit)
-  book.json           — Honkit config
-  LANGS.md            — list of languages (Honkit multilingual)
+.vitepress/           — site config: locales, sidebars, Mermaid rendering, SEO tags
+book/                 — the book sources (VitePress srcDir)
+  README.md           — language chooser at the site root
   <locale>/
     SUMMARY.md        — table of contents: groups = headings, patterns = links
     README.md         — locale landing page
@@ -28,11 +28,11 @@ One pattern = a file `book/<locale>/<slug>.md`. The file name (`<slug>`) is the 
 
 ```sh
 mise run setup    # locked toolchain, workspace dependencies and git hooks
-mise run serve    # local preview (honkit serve)
+mise run serve    # local preview (VitePress dev server)
 mise run check    # the same quality gates as CI
 mise run build    # static build into ./dist
-mise run pdf      # PDFs for all locales (requires Calibre/ebook-convert)
-mise run update   # update project tools and all workspace dependencies
+mise run preview  # serve ./dist as it is deployed
+mise run update   # update project tools and dependencies
 ```
 
 Use [mise](https://mise.jdx.dev/) 2026.11.3 or newer; CI pins 2026.11.4. Node is pinned in `mise.toml`; mise reads pnpm from `package.json`. `mise.lock` records tool downloads and checksums for Linux x64 and macOS arm64. Both setup and CI install from the committed lockfiles. After updating hk, update the two versioned Pkl imports in `hk.pkl` as well.

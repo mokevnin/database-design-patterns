@@ -19,6 +19,7 @@ const base = new URL(siteUrl).pathname;
 const bookTitle = 'Database Design Patterns';
 const bookDescription = 'Database design patterns in the spirit of the Gang of Four';
 const repoUrl = 'https://github.com/mokevnin/database-design-patterns';
+const authorUrl = 'https://github.com/mokevnin';
 
 /**
  * UI strings of each edition. The order is the language menu's order, and the
@@ -28,13 +29,16 @@ const editions = {
   en: {
     label: 'English',
     lang: 'en',
+    author: 'Kirill Mokevnin',
     ui: {}
   },
   ru: {
     label: 'Русский',
     lang: 'ru',
+    author: 'Кирилл Мокевнин',
     ui: {
       outline: { label: 'На этой странице' },
+      lastUpdated: { text: 'Обновлено' },
       docFooter: { prev: 'Предыдущая', next: 'Следующая' },
       darkModeSwitchLabel: 'Оформление',
       lightModeSwitchTitle: 'Светлая тема',
@@ -64,8 +68,10 @@ const editions = {
   es: {
     label: 'Español',
     lang: 'es',
+    author: 'Kirill Mokevnin',
     ui: {
       outline: { label: 'En esta página' },
+      lastUpdated: { text: 'Actualizado' },
       docFooter: { prev: 'Anterior', next: 'Siguiente' },
       darkModeSwitchLabel: 'Apariencia',
       lightModeSwitchTitle: 'Modo claro',
@@ -140,6 +146,14 @@ export default defineConfig({
   title: bookTitle,
   description: bookDescription,
   lang: 'en',
+  // Git commit dates: the sitemap's lastmod, the pages' dateModified and the
+  // "Last updated" line. Pages CI checks out the full history for them.
+  lastUpdated: true,
+
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}assets/cover/favicon.svg` }],
+    ['link', { rel: 'apple-touch-icon', href: `${base}assets/cover/apple-touch-icon.png` }]
+  ],
 
   // GitHub renders README.md as a folder's page; the site serves it as index.
   rewrites: {
@@ -208,7 +222,13 @@ export default defineConfig({
     locales,
     siteNames,
     bookTitle,
-    image: { path: 'assets/cover/og-{locale}.png', width: 1200, height: 630 }
+    image: { path: 'assets/cover/og-{locale}.png', width: 1200, height: 630 },
+    authors: Object.fromEntries(
+      Object.entries(editions).map(([locale, edition]) => [
+        locale,
+        { name: edition.author, url: authorUrl }
+      ])
+    )
   }),
 
   buildEnd(siteConfig) {

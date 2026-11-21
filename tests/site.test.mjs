@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { sitemapItems, summarize } from '../.vitepress/seo.mjs';
+import { isNoindex, jsonLd, sitemapItems, structuredData, summarize } from '../.vitepress/seo.mjs';
 import { sidebarFromSummary } from '../.vitepress/summary.mjs';
 
 test('SUMMARY.md becomes a grouped sidebar', () => {
@@ -65,4 +65,45 @@ test('the language chooser is the sitemap x-default', () => {
     item.links?.map((link) => link.lang),
     ['x-default', 'en', 'ru']
   );
+});
+
+test('the tables of contents and the 404 page stay out of the sitemap', () => {
+  assert.ok(isNoindex('en/SUMMARY.md'));
+  assert.ok(isNoindex('404.md'));
+  assert.ok(!isNoindex('en/summary-table.md'));
+  const items = sitemapItems([{ url: 'en/SUMMARY.html' }, { url: 'en/summary-table.html' }]);
+  assert.deepEqual(
+    items.map((item) => item.url),
+    ['en/summary-table.html']
+  );
+});
+
+test('a chapter is a TechArticle within its edition', () => {
+  const graph = structuredData({
+    kind: 'chapter',
+    url: 'https://example.org/en/soft-delete.html',
+    editionUrl: 'https://example.org/en/',
+    siteUrl: 'https://example.org/',
+    siteName: 'Database Design Patterns',
+    lang: 'en',
+    title: 'Soft Delete',
+    description: undefined,
+    image: 'https://example.org/og-en.png',
+    author: { name: 'Author', url: 'https://example.org/author' },
+    modified: '2026-11-11T12:07:43.000Z',
+    editions: ['en', 'ru']
+  });
+  const [article, book, breadcrumbs] = /** @type {any[]} */ (graph['@graph']);
+  assert.equal(article['@type'], 'TechArticle');
+  assert.deepEqual(article.isPartOf, { '@id': 'https://example.org/en/#book' });
+  assert.equal(book['@id'], 'https://example.org/en/#book');
+  assert.deepEqual(
+    breadcrumbs.itemListElement.map((/** @type {any} */ item) => item.item),
+    ['https://example.org/en/', 'https://example.org/en/soft-delete.html']
+  );
+  assert.ok(!('description' in JSON.parse(jsonLd(graph))['@graph'][0]));
+});
+
+test('JSON-LD cannot close its script element', () => {
+  assert.equal(jsonLd({ text: '</script>' }), '{"text":"\\u003c/script>"}');
 });

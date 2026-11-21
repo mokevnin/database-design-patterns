@@ -8,7 +8,7 @@ The book is built from markdown with [VitePress](https://vitepress.dev/). Naviga
 1. Pick a kebab-case `slug` (e.g. `soft-delete`). It becomes the file name in every locale and the key under `book/assets/`.
 2. Create the chapter in the canonical locale: copy [`templates/en/pattern.md`](templates/en/pattern.md) to `book/en/<slug>.md` and fill it in. Do not change the section headings — they are the same across all chapters of that language.
 3. Add a link in `book/en/SUMMARY.md` under the right group heading (line order = order in the book).
-4. Draw diagrams as ```` ```mermaid ```` fences right in the chapter — they are rendered to SVG at build time and translated together with the surrounding text. Use the shared `accent` / `warn` / `muted` classes (`node:::accent`) so every diagram in the book shares one palette; the theme lives in `mermaid.config.json`, and its night-theme counterpart in `mermaid.config.dark.json`.
+4. Draw diagrams as ```` ```mermaid ```` fences right in the chapter — they are drawn in the reader's browser and translated together with the surrounding text; check the page in `mise run serve`, since the build does not catch Mermaid syntax errors. Use the shared `accent` / `warn` / `muted` classes (`node:::accent`) so every diagram in the book shares one palette; the theme lives in `mermaid.config.json`, and its dark-theme counterpart in `mermaid.config.dark.json`.
 5. Anything that is genuinely a file — images, runnable SQL scripts with the engine version they were checked on — goes in `book/assets/<slug>/` and is referenced with a relative path `../assets/<slug>/...`.
 6. Preview with `pnpm start`.
 

@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { defineConfig } from 'vitepress';
 
-import { createMermaid, loadThemes } from './mermaid.mjs';
+import { mermaidMarkdown } from '@mokevnin/vitepress-mermaid/markdown';
 import { describePlugin, seoHead, sitemapItems } from './seo.mjs';
 import { sidebarFromSummary } from './summary.mjs';
 
@@ -129,10 +129,6 @@ function pagesOf(locale) {
 
 const siteNames = Object.fromEntries(locales.map((locale) => [locale, siteNameOf(locale)]));
 
-const mermaid = createMermaid({
-  ...loadThemes(path.join(root, 'mermaid.config.json'), path.join(root, 'mermaid.config.dark.json'))
-});
-
 export default defineConfig({
   srcDir,
   outDir: path.join(root, 'dist'),
@@ -187,12 +183,11 @@ export default defineConfig({
         }
       });
       describePlugin(md);
-      mermaid.markdown(md);
+      md.use(mermaidMarkdown);
     }
   },
 
   vite: {
-    plugins: [mermaid.vitePlugin()],
     build: {
       // The local search index of a long edition is one chunk of about a
       // megabyte; it loads only when the reader opens search.

@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { captionOf } from '../.vitepress/mermaid.mjs';
 import { sitemapItems, summarize } from '../.vitepress/seo.mjs';
 import { sidebarFromSummary } from '../.vitepress/summary.mjs';
 
@@ -66,12 +65,4 @@ test('the language chooser is the sitemap x-default', () => {
     item.links?.map((link) => link.lang),
     ['x-default', 'en', 'ru']
   );
-});
-
-test('a diagram caption comes from its frontmatter title', () => {
-  assert.equal(
-    captionOf('---\ntitle: "Two sessions race"\n---\nflowchart TB\n  a --> b'),
-    'Two sessions race'
-  );
-  assert.equal(captionOf('flowchart TB\n  a --> b'), 'Diagram');
 });

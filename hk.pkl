@@ -21,7 +21,7 @@ local checks = new Mapping<String, Step> {
         check = "node --test tests/"
     }
     ["syncpack"] {
-        glob = List("package.json", "pnpm-workspace.yaml", ".syncpackrc.json")
+        glob = List("package.json", ".syncpackrc.json")
         check = "syncpack lint"
         fix = "syncpack fix"
     }

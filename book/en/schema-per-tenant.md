@@ -212,6 +212,24 @@ Serialize migration runners per tenant, and commit transactional DDL with its ve
 
 A worker that crashes between tenant migrations leaves a partially upgraded fleet. Record completion per tenant and resume only the outstanding versions. Keep the application compatible with that mixed state. Retry only after determining whether that tenant's previous transaction committed; do not equate a lost connection with a failed migration.
 
+```mermaid
+---
+title: The fleet advances one tenant at a time, and a stalled tenant waits without blocking the rest
+---
+flowchart TB
+    each["For each tenant in the directory"] --> lock["Acquire that tenant's advisory lock"]
+    lock --> check{"Version already recorded in its schema_migration?"}
+    check -->|yes| skip["Skip: already migrated"]:::muted
+    check -->|no| apply["Run the DDL and insert the version marker in one transaction"]
+    apply -->|commit| ok["Tenant on the new version"]:::muted
+    apply -->|lock_timeout| defer["Defer to a later pass and continue with the next tenant"]:::warn
+    apply -->|connection lost| verify["Read the marker to learn whether it committed"]:::warn
+    verify -->|recheck| check
+    defer -.-> mixed["Until every deferred tenant commits, the fleet is mixed and the application serves both versions"]:::accent
+```
+
+Neither warning path stops the pass. A lock timeout postpones one tenant, and a lost connection sends the runner back to that tenant's marker, because only the marker says whether the transaction committed. Until the deferred tenants catch up, the fleet is mixed, which is why the application must stay compatible with both versions.
+
 ## Migration
 
 For an existing single-tenant database, first separate tenant-owned objects from shared control and reference data. For a shared-schema source, copy each tenant's customer and order rows into a complete target namespace, preserving their local relationships. Do not create cross-schema foreign keys merely to avoid copying tenant-owned children: that would make later movement depend on another tenant's namespace.

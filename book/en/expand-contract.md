@@ -282,6 +282,37 @@ stateDiagram-v2
 
 Before contraction, rollback means switching readers and application versions while leaving the bridge installed. After contraction, reinstalling an old binary requires a new expansion and reconstruction of its contract. A reverse migration is safe only if every value written since the switch remains representable.
 
+```mermaid
+---
+title: Old and new releases share the rows for weeks, so contraction waits for the last old consumer
+config:
+  gantt:
+    useWidth: 900
+    fontSize: 16
+    sectionFontSize: 16
+    leftPadding: 150
+---
+gantt
+    dateFormat YYYY-MM-DD
+    axisFormat %b %d
+    tickInterval 1week
+    section Schema
+    full_name only :s1, 2026-03-02, 2026-03-09
+    both names and the bridge :s2, 2026-03-09, 2026-04-20
+    display_name only :active, s3, 2026-04-20, 2026-04-27
+    section Data
+    Backfill batches :d1, 2026-03-16, 2026-03-30
+    Verify and validate :d2, 2026-03-30, 2026-04-06
+    section Release 1
+    Reads and writes full_name :r1, 2026-03-02, 2026-04-13
+    section Release 2
+    Reads display_name :r2, 2026-04-06, 2026-04-27
+    Switch readers :vert, g1, 2026-04-06, 0d
+    Rollback window ends :vert, g2, 2026-04-20, 0d
+```
+
+The dates are illustrative; the order of the bars is the point. From the read switch until Release 1 retires, both releases write the same rows, and the bridge keeps their names equal. Contraction starts only after the last old consumer is gone and the rollback window has closed, not as soon as the backfill finishes.
+
 For a **table split**, start with `product(product_id, name, specification)` and move the specification into a shared-key extension. Keep the old column authoritative during overlap; an after-write trigger mirrors it into `product_detail`, so old writers remain compatible. New readers join the detail only after backfill. This is the optional-extension mechanism explained in [Table Split](table-split.md), with completeness additionally required at this migration's read-switch gate.
 
 ```mermaid

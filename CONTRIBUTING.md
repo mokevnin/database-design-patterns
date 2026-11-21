@@ -1,6 +1,6 @@
 # Contributing
 
-The book is built from markdown with [Honkit](https://github.com/honkit/honkit). Navigation and grouping come from `book/<locale>/SUMMARY.md` — a separate file per language.
+The book is built from markdown with [VitePress](https://vitepress.dev/). Navigation and grouping come from `book/<locale>/SUMMARY.md` — a separate file per language; `.vitepress/config.mjs` turns each one into that edition's sidebar.
 
 ## Add a new pattern
 
@@ -25,7 +25,7 @@ Anti-patterns go into the "Anti-patterns" group of `SUMMARY.md` and use `templat
 
 ## Chapter front matter (optional but useful)
 
-Honkit takes the title from the first `#` and navigation from `SUMMARY.md`. A small front matter is handy as metadata and reads well on GitHub:
+VitePress takes the title from the first `#`; navigation comes from `SUMMARY.md`. A small front matter is handy as metadata and reads well on GitHub:
 
 ```yaml
 ---
@@ -37,11 +37,11 @@ description:             # search and link-preview summary (see below)
 ---
 ```
 
-The website's meta description and Open Graph description come from the chapter's first paragraph — a pattern's Intent — cut to its first sentence when it runs past 200 characters (`plugins/honkit-plugin-seo`). Set `description` only where that paragraph does not summarize the page: anti-patterns open with "Also known as", so every anti-pattern sets one sentence under 160 characters, and a translation translates it.
+The website's meta description and Open Graph description come from the chapter's first paragraph — a pattern's Intent — cut to its first sentence when it runs past 200 characters (`.vitepress/seo.mjs`). Set `description` only where that paragraph does not summarize the page: anti-patterns open with "Also known as", so every anti-pattern sets one sentence under 160 characters, and a translation translates it.
 
 ## Translation
 
-- The canonical locale is `en` (`language` in `book/book.json`). A pattern is written in English first; the `ru` edition is translated from it. The `es` translation is deferred until a separate pass.
+- The canonical locale is `en` (the first edition in `.vitepress/config.mjs`). A pattern is written in English first; the `ru` edition is translated from it. The `es` translation is deferred until a separate pass.
 - To translate, copy `book/en/<slug>.md` to `book/<locale>/<slug>.md`, translate the text, and add a link to `book/<locale>/SUMMARY.md` in the same group. Use the matching template under `templates/<locale>/` for the localized headings.
 - In the translation's front matter set `source_rev` — the git SHA of the en chapter at the time of translating, so staleness can be tracked:
 

@@ -1,0 +1,20 @@
+figure.mermaid {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+figure.mermaid img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Each diagram comes in both palettes; the page shows the one matching the theme. */
+.mermaid-themed .mermaid-dark,
+html.dark .mermaid-themed .mermaid-light {
+  display: none;
+}
+
+html.dark .mermaid-themed .mermaid-dark {
+  display: block;
+}

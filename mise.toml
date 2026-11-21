@@ -37,16 +37,16 @@ run = [
 ]
 
 [tasks.serve]
-description = "Local preview (Honkit serve)"
+description = "Local preview (VitePress dev server)"
 run = "pnpm start"
 
 [tasks.build]
 description = "Static build into ./dist"
 run = "pnpm build"
 
-[tasks.pdf]
-description = "PDFs for all locales"
-run = ["pnpm pdf:ru", "pnpm pdf:en", "pnpm pdf:es"]
+[tasks.preview]
+description = "Serve the static build from ./dist"
+run = "pnpm preview"
 
 [tasks.check]
 description = "Run every check (hk.pkl); CI runs the same task"

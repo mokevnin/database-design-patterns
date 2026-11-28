@@ -287,3 +287,4 @@ Readers can use the old representation while structural writes pause for final r
 - [Nested Sets](nested-sets.md) turns subtree reads into interval scans.
 - [Closure Table](closure-table.md) materializes reachability separately from nodes.
 - [Fixed-Depth Queries](fixed-depth-queries.md) identifies the traversal mistake without condemning parent references.
+- [Graph Edges](graph-edges.md) generalizes parent references to several parents per node.

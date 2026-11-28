@@ -14,6 +14,5 @@
 |---|---|---|
 | Слияние записей — объединение дублей без потери ссылок | `record-merge` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20record-merge%22) |
 | Ссылка на файл — файлы вне базы и строки с их метаданными | `file-reference` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20file-reference%22) |
-| Рёбра графа — связи «многие ко многим» внутри одной таблицы | `graph-edges` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20graph-edges%22) |
 | Правило повторения — повторяющиеся события с исключениями | `recurrence-rule` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20recurrence-rule%22) |
 | Выдача прав — роли, права и их назначения | `permission-grant` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20permission-grant%22) |

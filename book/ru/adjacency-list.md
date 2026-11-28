@@ -2,7 +2,7 @@
 group: hierarchies
 status: translated
 related: [materialized-path, nested-sets, closure-table, fixed-depth-queries]
-source_rev: 0d5af2dffd0cbe2d7070b6d88b9d3d756c08a6ef
+source_rev: 68378dc5cd7f536a5bedc95b9bc0b121a9d05b24
 ---
 
 # Список смежности
@@ -288,3 +288,4 @@ stateDiagram-v2
 - [Вложенные множества](nested-sets.md) превращают чтение поддеревьев в проходы по интервалам.
 - [Таблица замыканий](closure-table.md) материализует достижимость отдельно от узлов.
 - [Фиксированная глубина](fixed-depth-queries.md) выявляет ошибку обхода, не осуждая родительские ссылки.
+- [Рёбра графа](graph-edges.md) обобщают ссылку на родителя до нескольких родителей у узла.

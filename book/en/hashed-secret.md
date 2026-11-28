@@ -282,3 +282,4 @@ For tokens stored in clear, hash the existing values in place into a new `token_
 - [Table Split](table-split.md) keeps verifiers apart from the frequently read user row.
 - [Canonical Value](canonical-value.md) normalizes the login name that the password is checked against.
 - [Audit Log](audit-log.md) records who changed a credential, not the credential.
+- [Guessable Links](guessable-links.md) applies the token digest to share-by-link URLs, one revocable row per link.

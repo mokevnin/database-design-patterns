@@ -257,6 +257,7 @@ You can stop issuing new handles during rollback, but continue resolving handles
 - Treating prefixes as permanent third-party parsing rules. Store external IDs intact; enforce the regex above only for the API you control.
 - Reusing a retired public handle, or rotating it without considering bookmarks and integrations.
 - Adding public IDs to tables that never cross a boundary; see [Mandatory Surrogates](mandatory-surrogates.md).
+- Turning an ID, or a hash or Sqids encoding of it, into an anonymous share link; see [Guessable Links](guessable-links.md).
 
 ## Known uses
 

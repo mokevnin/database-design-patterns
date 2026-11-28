@@ -25,9 +25,10 @@ mindmap
     Reference and state
       Value membership
       Accepted transitions
-    Hierarchies
+    Hierarchies and graphs
       Parent links
       Materialized traversal
+      General graphs
     Types and attributes
       Subtypes and target kinds
       Variable fields
@@ -447,6 +448,7 @@ Are links one-parent navigation, shared recipe requirements or merely reachabili
 | Pattern | Parent and edge requirement | Read requirement | Change and reproducibility cost |
 | --- | --- | --- | --- |
 | [Bill of Materials](bill-of-materials.md) | Reused components; quantity per parent/child version edge | Multiply along every route and sum leaf requirements | Validate acyclicity; immutable releases; pin selected version on orders |
+| [Graph Edges](graph-edges.md) | Several predecessors and successors per node; edge kinds may be directed, symmetric or acyclic; edges carry weights, not multiplied quantities | Traverse with a recursive CTE, SEARCH/CYCLE and a depth bound; paths, not nodes | Symmetric pairs stored once by CHECK; acyclicity needs a trigger plus a component lock at Read Committed, or Serializable for every writer |
 | [Adjacency List](adjacency-list.md) | At most one parent; no shared recipe requirement | Traverse the hierarchy | Simple parent changes with coordinated cycle checks |
 | [Closure Table](closure-table.md) | Precomputed ancestry supplements component edges | Frequent where-used/reachability joins | Tree algorithm needs redesign for multiple paths; pairs alone cannot calculate demand |
 | [Effective Dating](effective-dating.md) | Business dates choose released versions | Resolve the schedule for new work | Complement to pinning; a later schedule change must not rewrite old orders |

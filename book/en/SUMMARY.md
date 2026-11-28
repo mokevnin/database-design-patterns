@@ -27,12 +27,13 @@
 * [Status History](status-history.md)
 * [Proposed Change](proposed-change.md)
 
-## Hierarchies
+## Hierarchies and Graphs
 
 * [Adjacency List](adjacency-list.md)
 * [Materialized Path](materialized-path.md)
 * [Nested Sets](nested-sets.md)
 * [Closure Table](closure-table.md)
+* [Graph Edges](graph-edges.md)
 
 ## Types and Attributes
 

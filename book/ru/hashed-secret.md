@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [public-identifier, table-split, canonical-value, audit-log]
-source_rev: 46451149486b0c2c4a9d3e832c5d3d1d6e88a788
+source_rev: 1f7af16d9dc7b959fd5536b772d1b290be4cceee
 ---
 
 # Хешированный секрет
@@ -287,3 +287,4 @@ sequenceDiagram
 - [Разделение таблицы](table-split.md) держит проверочные значения отдельно от часто читаемой строки пользователя.
 - [Каноническое значение](canonical-value.md) нормализует имя для входа, с которым сверяется пароль.
 - [Журнал аудита](audit-log.md) записывает, кто изменил учётные данные, а не сами учётные данные.
+- [Угадываемые ссылки](guessable-links.md) применяют дайджест токена к ссылкам для общего доступа: одна отзываемая строка на ссылку.

@@ -90,6 +90,7 @@
 * [Fixed-Depth Queries](fixed-depth-queries.md)
 * [Cloned Tables](cloned-tables.md)
 * [Inexact Arithmetic](inexact-arithmetic.md)
+* [Guessable Links](guessable-links.md)
 
 ## Appendices
 

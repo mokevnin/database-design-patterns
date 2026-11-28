@@ -2,7 +2,7 @@
 group: reliable-writes
 status: translated
 related: [idempotency-record, queue-table]
-source_rev: adc574108c92b21edcbe529ca62fd667d8f806ad
+source_rev: 31edb231a2648b7eb5591b4f61fe9eeaead1a41e
 ---
 
 # Транзакционный outbox

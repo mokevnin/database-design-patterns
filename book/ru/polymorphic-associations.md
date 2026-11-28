@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Полиморфная связь хранит тип цели и ID без внешнего ключа, поэтому база не может доказать существование целевой строки.
 status: translated
 related: [exclusive-arc, class-table-inheritance, missing-foreign-keys]
-source_rev: a584760a0960bd32079ab4e7c9ed12860899950c
+source_rev: 31edb231a2648b7eb5591b4f61fe9eeaead1a41e
 ---
 
 # Полиморфные связи

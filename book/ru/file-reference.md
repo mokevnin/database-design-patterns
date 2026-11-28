@@ -2,7 +2,7 @@
 group: relationships
 status: translated
 related: [polymorphic-associations, exclusive-arc, association-table, transactional-outbox, queue-table, soft-delete, table-split]
-source_rev:
+source_rev: 31edb231a2648b7eb5591b4f61fe9eeaead1a41e
 ---
 
 # Ссылка на файл

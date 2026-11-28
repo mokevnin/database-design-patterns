@@ -52,6 +52,7 @@
 * [Bitemporal Table](bitemporal-table.md)
 * [Audit Log](audit-log.md)
 * [Soft Delete](soft-delete.md)
+* [Archive Table](archive-table.md)
 
 ## Domain Structures
 

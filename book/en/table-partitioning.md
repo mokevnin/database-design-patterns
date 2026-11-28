@@ -193,7 +193,7 @@ ALTER TABLE activity_event ATTACH PARTITION activity_event_2026_11
     FOR VALUES FROM ('2026-11-01') TO ('2026-12-01');
 ```
 
-Only drop the detached table after your archive and recovery requirements are satisfied. If other tables reference retained event keys, their dependency and retention policy must be resolved before removal; this lab intentionally has no incoming event foreign keys.
+Only drop the detached table after your archive and recovery requirements are satisfied. [Archive Table](archive-table.md) shows that a partition still referenced by live rows cannot be detached, and the row-by-row alternative when the archive cut is not a partition key. If other tables reference retained event keys, their dependency and retention policy must be resolved before removal; this lab intentionally has no incoming event foreign keys.
 
 ```mermaid
 ---

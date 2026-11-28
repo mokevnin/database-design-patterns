@@ -44,7 +44,7 @@ SELECT (SELECT sale_count = 2 AND total_cents = 2000 FROM daily_sale) AS verifie
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -62,7 +62,7 @@ SELECT (SELECT sale_count = 2 AND total_cents = 2300 FROM daily_sale) AS verifie
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -81,7 +81,7 @@ SELECT (SELECT sale_count = 1 AND total_cents = 1500 FROM daily_sale) AS verifie
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -96,7 +96,7 @@ SELECT (SELECT :'rejected_state' = '23505') AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 COMMIT;
 
@@ -132,7 +132,7 @@ SELECT (SELECT sale_count = 1 AND total_cents = 1500 FROM daily_sale) AS verifie
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -162,7 +162,7 @@ SELECT (SELECT sale_count = 1 AND total_cents = 1500 FROM daily_sale) AS verifie
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -180,7 +180,7 @@ SELECT (SELECT sale_count = 0 AND total_cents = 0 FROM daily_sale) AS verified \
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -200,6 +200,6 @@ SELECT (SELECT NOT EXISTS (SELECT FROM daily_sale_snapshot)) AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 

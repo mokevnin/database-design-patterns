@@ -64,7 +64,7 @@ SELECT (SELECT count(*) = 3 AND bool_and(full_name = display_name) FROM customer
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -80,7 +80,7 @@ SELECT (SELECT :'rejected_state' = '23514') AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 COMMIT;
 
@@ -100,7 +100,7 @@ SELECT (SELECT full_name = 'Meadow Shop' FROM customer WHERE customer_id = 2) AS
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -118,7 +118,7 @@ SELECT (SELECT c.display_name = 'Harbor Market' FROM customer_order AS o JOIN cu
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -160,7 +160,7 @@ SELECT (SELECT count(*) = 2 AND bool_and(p.specification = d.specification) FROM
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -172,7 +172,7 @@ SELECT (SELECT specification = 'Ash frame' FROM product_detail WHERE product_id 
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -180,7 +180,7 @@ SELECT (SELECT NOT EXISTS (SELECT FROM product_detail WHERE product_id = 3)) AS 
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -200,7 +200,7 @@ SELECT (SELECT d.specification = 'Steel frame' FROM product AS p JOIN product_de
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -232,7 +232,7 @@ SELECT (SELECT bool_and(units_big = units) FROM stock) AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -247,7 +247,7 @@ SELECT (SELECT :'rejected_state' = '22003') AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 COMMIT;
 
@@ -266,6 +266,6 @@ SELECT (SELECT units_big = 2147483648 FROM stock WHERE stock_id = 1) AS verified
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 

@@ -46,7 +46,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 UPDATE customer SET public_id = 'cus_550e8400-e29b-41d4-a716-446655440001'

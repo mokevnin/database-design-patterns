@@ -34,7 +34,7 @@ SELECT (SELECT array_agg(tableoid::regclass::text ORDER BY event_day) = ARRAY['a
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -57,7 +57,7 @@ SELECT (SELECT :'rejected_state' = '23514') AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 COMMIT;
 
@@ -73,7 +73,7 @@ SELECT (SELECT :'rejected_state' = '23505') AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 COMMIT;
 
@@ -89,7 +89,7 @@ SELECT (SELECT :'rejected_state' = '0A000') AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 COMMIT;
 
@@ -105,7 +105,7 @@ SELECT (SELECT (SELECT count(*) FROM activity_event) = 1 AND (SELECT count(*) FR
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -116,7 +116,7 @@ SELECT (SELECT count(*) = 2 FROM activity_event) AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 
@@ -131,7 +131,7 @@ SELECT (SELECT :'rejected_state' = '23503') AS verified \gset
 \if :verified
 \else
     \echo 'Assertion failed'
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 COMMIT;
 

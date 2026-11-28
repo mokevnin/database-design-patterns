@@ -28,7 +28,7 @@ INSERT INTO product_detail VALUES (1, 'Another specification');
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 CREATE TABLE account (
     account_id bigint PRIMARY KEY,
@@ -57,7 +57,7 @@ COMMIT;
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 DO $$ BEGIN
@@ -72,7 +72,7 @@ DELETE FROM account_private WHERE account_id = 10;
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 DELETE FROM account WHERE account_id = 10;
 

@@ -57,7 +57,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23P01' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 COMMIT;
 

@@ -62,7 +62,7 @@ WHERE playlist_id = 1 AND item_id = 2;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Swapping two positions requires temporary duplicate positions.
@@ -88,7 +88,7 @@ COMMIT;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 DO $$ BEGIN

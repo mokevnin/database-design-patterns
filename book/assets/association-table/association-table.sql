@@ -49,7 +49,7 @@ INSERT INTO project_member VALUES
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- This rejection is intentional; verify it and continue.
@@ -60,7 +60,7 @@ INSERT INTO project_member VALUES (999, 1, 'reader', DATE '2026-11-10');
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- This rejection is intentional; verify it and continue.
@@ -71,7 +71,7 @@ DELETE FROM person WHERE person_id = 1;
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 DELETE FROM project_member WHERE project_id = 20 AND person_id = 1;
 DELETE FROM project WHERE project_id = 10;

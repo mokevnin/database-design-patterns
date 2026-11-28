@@ -46,7 +46,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Users whose hash should be upgraded at their next successful login.
@@ -59,7 +59,7 @@ FROM user_password
 WHERE password_hash NOT LIKE '$argon2id$v=19$m=19456,t=2,p=1$%' \gset
 \if :legacy_found
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Rehash on login: replace only the hash that was verified, so a concurrent
@@ -75,7 +75,7 @@ WITH upgraded AS (
 SELECT count(*) = 1 AS rehashed FROM upgraded \gset
 \if :rehashed
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- API keys: a high-entropy random token, stored as its SHA-256 digest.
@@ -111,7 +111,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Authenticate a request: hash the presented token and look it up.
@@ -130,7 +130,7 @@ WHERE token_hash = sha256(convert_to(:'token', 'UTF8'))
   AND (expires_at IS NULL OR expires_at > now()) \gset
 \if :revoked
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Password reset: a single-use, expiring token, at most one open per user.
@@ -166,7 +166,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- ...so issuing a new one supersedes the old one in the same transaction.
@@ -186,7 +186,7 @@ WITH consumed AS (
 SELECT count(*) = 1 AS first_use FROM consumed \gset
 \if :first_use
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 WITH consumed AS (
@@ -199,7 +199,7 @@ WITH consumed AS (
 SELECT count(*) = 0 AS second_use_refused FROM consumed \gset
 \if :second_use_refused
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- The superseded token no longer works either.
@@ -209,7 +209,7 @@ WHERE token_hash = sha256(convert_to(:'reset1', 'UTF8'))
   AND expires_at > now() \gset
 \if :old_token_refused
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 ROLLBACK;

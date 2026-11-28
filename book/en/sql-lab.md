@@ -103,7 +103,7 @@ An `ERROR` line is sometimes the demonstration succeeding. Judge it by the nearb
 | Savepoint plus temporarily disabled `ON_ERROR_STOP` | An invalid statement prints an error; the script saves `:SQLSTATE`, enables stopping again and rolls back to the savepoint | Saved state differs from the expected one, including when the invalid statement unexpectedly succeeds |
 | `DO` block with a named exception handler | An inner block attempts the invalid operation, catches only the expected condition and prints a notice | An unexpected exception escapes, a checked diagnostic differs, or the explicit failure after unexpected success escapes |
 | `pg_temp.expect_error` helper in the anti-pattern labs | Dynamic SQL runs inside an exception block; stacked diagnostics capture state and message | Either state or exact message differs; no exception also fails the comparison |
-| Assertions and result gates | `ASSERT`, explicit `IF ... RAISE EXCEPTION`, or a query followed by `\gset` and `\if` checks resulting data | A failed gate raises an exception, deliberately evaluates `1 / 0`, or issues `\quit 1` |
+| Assertions and result gates | `ASSERT`, explicit `IF ... RAISE EXCEPTION`, or a query followed by `\gset` and `\if` checks resulting data | A failed gate raises an exception or deliberately evaluates `1 / 0` under `ON_ERROR_STOP`; `\quit` would exit with status 0, because psql ignores its argument |
 
 For example, [Surrogate Key's script](../assets/surrogate-key/surrogate-key.sql) uses this sequence inside its lab transaction:
 
@@ -118,7 +118,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 ```
 

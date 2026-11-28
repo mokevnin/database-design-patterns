@@ -82,6 +82,7 @@
 * [Списки с разделителями](delimited-lists.md)
 * [Обязательные суррогаты](mandatory-surrogates.md)
 * [Отсутствующие внешние ключи](missing-foreign-keys.md)
+* [Строки-заглушки](sentinel-rows.md)
 * [Повторяющиеся столбцы](repeated-columns.md)
 * [Полиморфные связи](polymorphic-associations.md)
 * [Нетипизированные свойства](untyped-properties.md)

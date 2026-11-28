@@ -14,4 +14,3 @@ Russian, English, and Spanish are welcome; participation requires a GitHub accou
 |---|---|---|
 | Record Merge — merging duplicate records without losing references | `record-merge` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20record-merge%22) |
 | Recurrence Rule — repeating events with exceptions | `recurrence-rule` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20recurrence-rule%22) |
-| Permission Grant — roles, permissions and their assignments | `permission-grant` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20permission-grant%22) |

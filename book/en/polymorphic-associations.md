@@ -240,3 +240,4 @@ The lab pauses source and parent writes during its copy. At scale, use [staged c
 - [Class Table Inheritance](class-table-inheritance.md) supplies a common referenceable supertype.
 - [Association Table](association-table.md) separates target-specific relationships.
 - [Missing Foreign Keys](missing-foreign-keys.md) explains the local integrity guarantee the generic pair omits.
+- [File Reference](file-reference.md) contrasts Active Storage's polymorphic attachment table with typed attachment tables.

@@ -60,6 +60,7 @@
 
 * [Party](party.md)
 * [Role Object](role-object.md)
+* [Permission Grant](permission-grant.md)
 * [Quantity](quantity.md)
 * [Observation](observation.md)
 * [Bill of Materials](bill-of-materials.md)

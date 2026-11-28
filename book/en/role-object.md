@@ -83,7 +83,7 @@ A party has many episodes, including several of different types at once. Composi
 - **`party_role`** has a stable episode ID, a bounded start and a nonempty date range. `role_no_conflict` forbids overlap within `(party_id, conflict_group)`.
 - **`customer_terms`** can reference only a customer episode; its credit amount is nonnegative. Currency is required, with exact-amount policy discussed in [Quantity](quantity.md).
 - **`role_relationship`** permits one manager per customer episode, with checked customer and manager endpoint types. Its applicability is the intersection of the two role periods; it promises neither coverage of the whole customer period nor independent assignment history.
-- **Metadata policy** keeps party IDs and role types fixed after episode creation. The sample demonstrates period edits; it does not install a general authorization layer or an immutable episode-history mechanism.
+- **Metadata policy** keeps party IDs and role types fixed after episode creation. The sample demonstrates period edits; it does not install a general authorization layer (see [Permission Grant](permission-grant.md)) or an immutable episode-history mechanism.
 
 ## When to use
 

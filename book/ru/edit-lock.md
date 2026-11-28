@@ -2,7 +2,7 @@
 group: reliable-writes
 status: translated
 related: [version-column, queue-table, reservation, time-point, audit-log]
-source_rev:
+source_rev: bf5f6b7008ef32f3a7e21a153cde728c02db1e56
 ---
 
 # Блокировка редактирования

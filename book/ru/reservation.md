@@ -2,7 +2,7 @@
 group: reliable-writes
 status: translated
 related: [effective-dating, version-column, queue-table]
-source_rev: adc574108c92b21edcbe529ca62fd667d8f806ad
+source_rev: bf5f6b7008ef32f3a7e21a153cde728c02db1e56
 ---
 
 # Резервирование
@@ -297,3 +297,4 @@ stateDiagram-v2
 - [Таблица очереди](queue-table.md) планирует очистку, не владея решениями о ёмкости.
 - [Двойная запись](double-entry-ledger.md) регистрирует сохраняющие количество движения запасов или денег.
 - [Неточная арифметика](inexact-arithmetic.md) объясняет, почему точным количествам нужно точное представление.
+- [Блокировка редактирования](edit-lock.md) удерживает исключительное право редактировать, а не ёмкость.

@@ -2,7 +2,7 @@
 group: reliable-writes
 status: translated
 related: [transactional-outbox, idempotency-record, reservation]
-source_rev: adc574108c92b21edcbe529ca62fd667d8f806ad
+source_rev: bf5f6b7008ef32f3a7e21a153cde728c02db1e56
 ---
 
 # Таблица очереди
@@ -314,3 +314,4 @@ stateDiagram-v2
 - [Резервирование](reservation.md) даёт предметным требованиям на ёмкость собственный жизненный цикл.
 - [Отсутствующие внешние ключи](missing-foreign-keys.md) объясняют типизированную ссылку, сохранённую примером.
 - [Расширение и свёртывание](expand-contract.md) поэтапно обновляет нагрузки и обработчики, сохраняя принятые задания.
+- [Блокировка редактирования](edit-lock.md) применяет те же аренду и поколение к редактору-человеку.

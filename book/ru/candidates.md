@@ -18,4 +18,3 @@
 | Правило повторения — повторяющиеся события с исключениями | `recurrence-rule` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20recurrence-rule%22) |
 | Архивная таблица — перенос старых закрытых данных из рабочих таблиц | `archive-table` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20archive-table%22) |
 | Выдача прав — роли, права и их назначения | `permission-grant` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20permission-grant%22) |
-| Блокировка редактирования — пессимистическая блокировка между запросами | `edit-lock` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20edit-lock%22) |

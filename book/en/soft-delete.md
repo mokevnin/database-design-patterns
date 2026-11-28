@@ -147,7 +147,7 @@ stateDiagram-v2
 
 Purge is outside the reversible lifecycle. A deletion timestamp alone cannot tell a restoration workflow which children were independently deleted and which were hidden as part of a parent operation.
 
-For an aggregate, record the deletion as an operation and mark every row it hides with that operation's ID. A project owns tasks; deleting the project hides the project and its still-live tasks under one `deletion_id`, while a task deleted earlier keeps its own:
+For an aggregate, record the deletion as an operation and mark every row it hides with that operation's ID; physical cascades are covered in [Dependent Table](dependent-table.md). A project owns tasks; deleting the project hides the project and its still-live tasks under one `deletion_id`, while a task deleted earlier keeps its own:
 
 ```sql
 CREATE TABLE soft_example.deletion (

@@ -14,7 +14,6 @@ Russian, English, and Spanish are welcome; participation requires a GitHub accou
 |---|---|---|
 | Record Merge — merging duplicate records without losing references | `record-merge` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20record-merge%22) |
 | Document Number — sequential numbers per scope, such as invoice numbers | `document-number` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20document-number%22) |
-| Dependent Table — owned rows and what deleting a parent does to them | `dependent-table` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20dependent-table%22) |
 | File Reference — files outside the database and their metadata rows | `file-reference` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20file-reference%22) |
 | Proposed Change — drafts and changes that need approval | `proposed-change` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20proposed-change%22) |
 | Graph Edges — general many-to-many links within one table | `graph-edges` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20graph-edges%22) |

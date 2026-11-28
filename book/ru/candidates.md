@@ -14,7 +14,6 @@
 |---|---|---|
 | Слияние записей — объединение дублей без потери ссылок | `record-merge` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20record-merge%22) |
 | Номер документа — сквозная нумерация в пределах области, например номера счетов | `document-number` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20document-number%22) |
-| Зависимая таблица — подчинённые строки и что с ними происходит при удалении родителя | `dependent-table` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20dependent-table%22) |
 | Ссылка на файл — файлы вне базы и строки с их метаданными | `file-reference` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20file-reference%22) |
 | Предложенное изменение — черновики и изменения, требующие подтверждения | `proposed-change` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20proposed-change%22) |
 | Рёбра графа — связи «многие ко многим» внутри одной таблицы | `graph-edges` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20graph-edges%22) |

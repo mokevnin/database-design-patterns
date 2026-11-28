@@ -14,6 +14,7 @@
 
 ## Связи
 
+* [Зависимая таблица](dependent-table.md)
 * [Таблица связей](association-table.md)
 * [Разделение таблицы](table-split.md)
 * [Упорядоченная коллекция](ordered-collection.md)

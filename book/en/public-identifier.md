@@ -12,7 +12,7 @@ A public identifier is the ID that leaves the database in URLs, API responses, s
 
 ## Also known as
 
-External ID; opaque object ID; prefixed ID when the representation carries a type hint. Stripe's [object-ID article](https://dev.to/stripe/designing-apis-for-humans-object-ids-3o5a) uses Customer IDs such as `cus_...`. A prefix describes a representation; it does not define an authorization boundary.
+External ID; opaque object ID; prefixed ID when the representation carries a type hint. Here External ID is the outbound handle you issue; an ID another system issued to you is an [External Reference](external-reference.md). Stripe's [object-ID article](https://dev.to/stripe/designing-apis-for-humans-object-ids-3o5a) uses Customer IDs such as `cus_...`. A prefix describes a representation; it does not define an authorization boundary.
 
 ## Problem
 

@@ -8,6 +8,7 @@
 * [Natural Key](natural-key.md)
 * [Time-Ordered Identifier](time-ordered-identifier.md)
 * [Public Identifier](public-identifier.md)
+* [External Reference](external-reference.md)
 * [Canonical Value](canonical-value.md)
 * [Hashed Secret](hashed-secret.md)
 

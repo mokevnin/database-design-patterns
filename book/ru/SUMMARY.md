@@ -8,6 +8,7 @@
 * [Естественный ключ](natural-key.md)
 * [Упорядоченный идентификатор](time-ordered-identifier.md)
 * [Публичный идентификатор](public-identifier.md)
+* [Внешняя ссылка](external-reference.md)
 * [Каноническое значение](canonical-value.md)
 * [Хешированный секрет](hashed-secret.md)
 

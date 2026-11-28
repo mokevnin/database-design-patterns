@@ -199,7 +199,7 @@ SELECT customer_id FROM customer_source_id
 WHERE source_system = 'crm' AND external_id = '42';
 ```
 
-Suppose CRM customer `42` and billing customer `007` have been confirmed as the same customer. Store both mappings with the same local `customer_id`. Billing customer `42` can map to a different local customer. On the next import, look up the pair before creating a customer. For an unfamiliar pair, use a verified business key or ask an operator to match it. If you create a customer, insert the customer and its mapping in one transaction. If a concurrent import claims the pair first, roll back and read the winning mapping. Orders still reference the local key, and API clients can keep using the [public identifier](public-identifier.md) your application issued.
+Suppose CRM customer `42` and billing customer `007` have been confirmed as the same customer. Store both mappings with the same local `customer_id`. Billing customer `42` can map to a different local customer. On the next import, look up the pair before creating a customer. For an unfamiliar pair, use a verified business key or ask an operator to match it. If you create a customer, insert the customer and its mapping in one transaction. If a concurrent import claims the pair first, roll back and read the winning mapping. [External Reference](external-reference.md) adds the environment scope and a claim that leaves no orphan customer. Orders still reference the local key, and API clients can keep using the [public identifier](public-identifier.md) your application issued.
 
 ## Engine support
 

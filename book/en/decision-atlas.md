@@ -107,6 +107,7 @@ Does another row represent membership, part of one entity, a user-controlled occ
 | [Table Split](table-split.md) | At most one detail row per core row | Optional group, separate permissions or measured benefit from separate rows | Shared PK/FK; full reads join; mandatory circular variant needs deferred checks |
 | [Ordered Collection](ordered-collection.md) | Occurrences within one owner | Users insert or move items independently of creation time | Serialize collection edits; stable item identity differs from mutable position |
 | [Localized Values](localized-values.md) | One entity has multiple locale rows | Edit, search and validate translations independently | Unique entity/locale pair; required default needs a lifecycle protocol |
+| [File Reference](file-reference.md) | Bytes in object storage; one metadata row per object, attached to owners through typed link tables | Upload directly to storage, share or deduplicate files, verify size and checksum | Pending row before upload, a sweeper for stale and unattached files, deletion after commit; the composite `(file_id, state)` FK keeps attached files from being deleted |
 | [Columns or a JSON locale map](localized-values.md) | Fixed language columns, or one aggregate map | Fixed small language set, or whole-map reads | Columns grow through DDL; JSON needs explicit key, type and default validation |
 
 ```mermaid

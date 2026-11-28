@@ -20,6 +20,7 @@
 * [Разделение таблицы](table-split.md)
 * [Упорядоченная коллекция](ordered-collection.md)
 * [Локализованные значения](localized-values.md)
+* [Ссылка на файл](file-reference.md)
 
 ## Справочники и состояние
 

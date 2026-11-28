@@ -20,6 +20,7 @@
 * [Table Split](table-split.md)
 * [Ordered Collection](ordered-collection.md)
 * [Localized Values](localized-values.md)
+* [File Reference](file-reference.md)
 
 ## Reference and State
 

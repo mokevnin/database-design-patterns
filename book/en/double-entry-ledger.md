@@ -124,7 +124,7 @@ The journal-to-entry edge describes committed postings; drafts temporarily have 
 - ➖ Zero sum proves conservation inside the modeled journal, not a valid business purpose, sufficient funds or agreement with an external bank.
 - ➖ Posting creates several rows and commit can still fail after all inserts succeed.
 - ➖ An overdraft rule needs coordination across journals touching the same account. Journal balance checks alone do not enforce it.
-- ➖ A single-currency journal cannot directly express an exchange by adding unlike currencies. Use balanced postings per currency with explicit clearing accounts and a retained quote or rate policy.
+- ➖ A single-currency journal cannot directly express an exchange by adding unlike currencies. Use balanced postings per currency with explicit clearing accounts and a retained quote or rate policy, as in [Captured Value](captured-value.md).
 
 ## Implementation
 

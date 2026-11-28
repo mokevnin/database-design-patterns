@@ -24,7 +24,7 @@ Even compatible dimensions need an interpretation policy. Is a temperature a rea
 
 Store each amount with a unit key and dimension. Keep a small controlled unit catalog with a factor to one base unit per dimension. A composite foreign key checks that a stored unit belongs to the declared dimension. Normalize compatible quantities before aggregation; return the result with the selected unit, not as an unexplained scalar.
 
-The worked converter supports only multiplicative conversions: `target_amount = source_amount × source_factor / target_factor`. It refuses different dimensions. Each currency has its own dimension key, so the unit converter cannot invent an exchange rate. Offset conversions, compound-dimension algebra and dated exchange quotes require separate models; this intentionally small catalog does not implement them.
+The worked converter supports only multiplicative conversions: `target_amount = source_amount × source_factor / target_factor`. It refuses different dimensions. Each currency has its own dimension key, so the unit converter cannot invent an exchange rate. Offset conversions, compound-dimension algebra and dated exchange quotes require separate models; this intentionally small catalog does not implement them. [Captured Value](captured-value.md) shows dated quotes with the applied rate stored on each conversion.
 
 ## Alternatives and selection
 

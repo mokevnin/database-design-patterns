@@ -141,7 +141,7 @@ INSERT INTO effective_example.price_commitment VALUES
     (1, 1, daterange('2026-01-15', '2026-03-15', '[)'));
 ```
 
-This insert succeeds across three adjacent price rows. The script then verifies that deleting February's price is rejected with SQLSTATE `23503` by `commitment_coverage`. Snapshot the contracted amount elsewhere if a commitment must retain it after a price correction.
+This insert succeeds across three adjacent price rows. The script then verifies that deleting February's price is rejected with SQLSTATE `23503` by `commitment_coverage`. Snapshot the contracted amount elsewhere, as a [Captured Value](captured-value.md), if a commitment must retain it after a price correction.
 
 ```mermaid
 ---

@@ -46,6 +46,7 @@
 * [Time Point](time-point.md)
 * [History Table](history-table.md)
 * [Effective Dating](effective-dating.md)
+* [Captured Value](captured-value.md)
 * [Bitemporal Table](bitemporal-table.md)
 * [Audit Log](audit-log.md)
 * [Soft Delete](soft-delete.md)

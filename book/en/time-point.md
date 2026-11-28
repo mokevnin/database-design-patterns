@@ -103,7 +103,7 @@ erDiagram
     class zone muted
 ```
 
-A sale keeps the zone that applied when it was recorded, so moving the shop to another zone later does not rewrite its history. An appointment keeps only local fields and a zone; its instants are computed in a view.
+A sale keeps the zone that applied when it was recorded, a [Captured Value](captured-value.md), so moving the shop to another zone later does not rewrite its history. An appointment keeps only local fields and a zone; its instants are computed in a view.
 
 ## Tables and invariants
 

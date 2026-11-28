@@ -271,7 +271,7 @@ The retained business references provide the rollback path during the overlap. R
 ## Anti-patterns and common mistakes
 
 - Dropping business uniqueness after adding a surrogate: the demonstrated duplicate then becomes valid.
-- Treating an ID as an invoice sequence or row count: sequence gaps invalidate that interpretation.
+- Treating an ID as an invoice sequence or row count: sequence gaps invalidate that interpretation; see [Document Number](document-number.md).
 - Adding an ID to a pure association and forgetting pair uniqueness; see [Mandatory Surrogates](mandatory-surrogates.md).
 - Exposing the storage key by accident and later discovering that clients depend on its shape; make the [public identity](public-identifier.md) decision explicitly.
 

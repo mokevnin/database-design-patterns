@@ -90,6 +90,7 @@
 * [Фиксированная глубина](fixed-depth-queries.md)
 * [Клонированные таблицы](cloned-tables.md)
 * [Неточная арифметика](inexact-arithmetic.md)
+* [Угадываемые ссылки](guessable-links.md)
 
 ## Приложения
 

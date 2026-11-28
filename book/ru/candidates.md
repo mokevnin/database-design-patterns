@@ -1,6 +1,6 @@
 # Кандидаты и голосование
 
-Какие темы стоит разобрать следующими? Ниже — короткие описания идей для новых глав. Они ещё не приняты: часть может объединиться с существующими паттернами. Последняя тема — предлагаемый антипаттерн.
+Какие темы стоит разобрать следующими? Ниже — короткие описания идей для новых глав. Они ещё не приняты: часть может объединиться с существующими паттернами.
 
 Полный список, источники, пересечения с другими главами и актуальные статусы — в [CANDIDATES.md](https://github.com/mokevnin/database-design-patterns/blob/main/CANDIDATES.md) на английском языке.
 
@@ -24,4 +24,3 @@
 | Архивная таблица — перенос старых закрытых данных из рабочих таблиц | `archive-table` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20archive-table%22) |
 | Выдача прав — роли, права и их назначения | `permission-grant` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20permission-grant%22) |
 | Блокировка редактирования — пессимистическая блокировка между запросами | `edit-lock` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20edit-lock%22) |
-| Угадываемые ссылки — публичные ссылки из последовательных ID или их хешей | `guessable-links` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20guessable-links%22) |

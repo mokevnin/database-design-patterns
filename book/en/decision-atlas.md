@@ -342,6 +342,7 @@ Which past question must you answer: recorded values, business validity, an earl
 | [Soft Delete](soft-delete.md) | Can removal be reversed in place with the same identity? | Apply live visibility everywhere; define live uniqueness and restore conflicts | Retains data and FK targets; ordinary FK does not require a target to be live |
 | [Status History](status-history.md) | Which legal lifecycle moves were accepted? | Guard transitions and commit history with current state | Does not version every attribute or capture rejected commands |
 | [Physical delete or deleted-record archive](soft-delete.md) | Can removal be immediate, or can restoration be an explicit import? | Follow reference/retention rules; archive outside live tables if recovery copy is needed | Avoid live-row filtering when in-place restore is unnecessary |
+| [Archive Table](archive-table.md) | Where do finished rows that must still be kept go, so live tables hold only the working set? | Move whole aggregates in small batches, checking the closed state at move time; read across tiers through a UNION ALL view; restore by explicit import | Live rows cannot reference archived rows; the archive has its own retention; SQL Server's OUTPUT INTO target allows no FKs or CHECKKs; partitioned tables can detach instead |
 
 ```mermaid
 ---

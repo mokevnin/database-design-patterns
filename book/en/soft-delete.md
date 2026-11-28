@@ -312,3 +312,4 @@ An archive-based migration instead changes physical-delete writers to capture th
 - [Version Column](version-column.md) rejects edits based on a stale lifecycle version.
 - [Missing Foreign Keys](missing-foreign-keys.md) explains why physical relationships still need enforcement.
 - [Expand and Contract](expand-contract.md) stages readers before enabling new write behavior.
+- [Archive Table](archive-table.md) moves finished, not deleted, rows out of live tables under their own retention.

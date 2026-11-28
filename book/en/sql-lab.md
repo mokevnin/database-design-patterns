@@ -10,7 +10,7 @@ SQL Lab explains how to run the book's examples. Each chapter's full scripts liv
 
 ## What you need
 
-The 63 pattern and anti-pattern chapters each have one script at `book/assets/<slug>/<slug>.sql`. Each header records the PostgreSQL 18 minor release the script was checked on: 18.6 for most, 18.7 for the newest. Use a PostgreSQL 18 server and its `psql` client: examples include `uuidv7()`, temporal keys, PostgreSQL ranges, PL/pgSQL and `psql` backslash commands. Other engines' implementation notes in the chapters are porting guidance, not claims that these files run unchanged there.
+The 64 pattern and anti-pattern chapters each have one script at `book/assets/<slug>/<slug>.sql`. Each header records the PostgreSQL 18 minor release the script was checked on: 18.6 for most, 18.7 for the newest. Use a PostgreSQL 18 server and its `psql` client: examples include `uuidv7()`, temporal keys, PostgreSQL ranges, PL/pgSQL and `psql` backslash commands. Other engines' implementation notes in the chapters are porting guidance, not claims that these files run unchanged there.
 
 Use a disposable cluster with a superuser connection. Some examples create roles, change privileges and install the supplied `ltree`, `btree_gist`, `dblink` or `pgrowlocks` extensions. Dependent Table also commits its last section and opens two extra connections to its own database through `dblink`, using the server's socket and the same role without a password. Canonical Value creates an ICU collation, so the server must be built with ICU support. The tenant examples also create passwordless login roles, and Database per Tenant creates `dt_a` and `dt_b` and reconnects as its runtime roles. Those reconnects require the lab's local trust authentication. A fresh database alone does not isolate cluster-wide roles or those extra databases.
 
@@ -147,11 +147,11 @@ docker exec \
   ddp-sql-lab sh /book/book/assets/sql-lab/run-all.sh
 ```
 
-The runner discovers `book/assets/*/*.sql` in pathname order, independently of your working directory. For each file it creates a uniquely named database from `template0`, runs `psql -X -v ON_ERROR_STOP=1`, drops the database and prints `PASS <slug>`. It stops at the first nonzero script exit and prints `FAIL <slug>`; its exit trap attempts cleanup on failure or interruption. Cleanup failures also fail the run. With all current files passing, the final line is `PASS: 63 scripts`.
+The runner discovers `book/assets/*/*.sql` in pathname order, independently of your working directory. For each file it creates a uniquely named database from `template0`, runs `psql -X -v ON_ERROR_STOP=1`, drops the database and prints `PASS <slug>`. It stops at the first nonzero script exit and prints `FAIL <slug>`; its exit trap attempts cleanup on failure or interruption. Cleanup failures also fail the run. With all current files passing, the final line is `PASS: 64 scripts`.
 
 The runner also removes the tenant labs' auxiliary databases (`dt_a`, `dt_b`) and roles (`ss_app`, `st_owner`, `st_app_a`, `st_app_b`, `dt_owner`, `dt_app_a`, `dt_app_b`). Audit Log creates `audit_example_app` inside a transaction that rolls back. A preflight check rejects any of these existing names before running anything; it does not reuse or delete pre-existing lab objects. Run only one suite at a time in its disposable cluster. After an uncatchable termination or a cleanup failure, discard that cluster and start another.
 
-The complete suite has been run successfully on a throwaway PostgreSQL 18.7 cluster: all 63 files passed with these checks enabled. The outbox lab assumes a broker acknowledgement in SQL rather than contacting a broker; queue and reservation examples advance test state instead of waiting for real worker deadlines.
+The complete suite has been run successfully on a throwaway PostgreSQL 18.7 cluster: all 64 files passed with these checks enabled. The outbox lab assumes a broker acknowledgement in SQL rather than contacting a broker; queue and reservation examples advance test state instead of waiting for real worker deadlines.
 
 ## Script catalog
 
@@ -219,6 +219,7 @@ The groups and chapter order below follow the book's [Summary](SUMMARY.md). Each
 | [Bitemporal Table](bitemporal-table.md) | [bitemporal-table.sql](../assets/bitemporal-table/bitemporal-table.sql) | Correct business history while retaining earlier recorded beliefs and overlap protection. |
 | [Audit Log](audit-log.md) | [audit-log.sql](../assets/audit-log/audit-log.sql) | Attributed atomic actions and runtime permissions that reject evidence rewriting. |
 | [Soft Delete](soft-delete.md) | [soft-delete.sql](../assets/soft-delete/soft-delete.sql) | Live-only uniqueness, retained references, restore conflict, physical-delete protection and aggregate restore by deletion operation. |
+| [Archive Table](archive-table.md) | [archive-table.sql](../assets/archive-table/archive-table.sql) | Batched aggregate moves, rejected moves of referenced or reopened orders, a two-tier view and its plans, restore conflicts and drift, retention and a blocked partition detach. |
 
 ### Domain Structures
 

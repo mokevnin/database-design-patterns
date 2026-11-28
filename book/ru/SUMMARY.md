@@ -60,6 +60,7 @@
 
 * [Участник](party.md)
 * [Объект роли](role-object.md)
+* [Выдача прав](permission-grant.md)
 * [Величина](quantity.md)
 * [Наблюдение](observation.md)
 * [Состав изделия](bill-of-materials.md)

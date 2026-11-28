@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [party, external-reference, dependent-table, surrogate-key, public-identifier, audit-log, soft-delete, canonical-value]
-source_rev: d55fe2e9b6be69222a2d210c3b9b4021d303df48
+source_rev: 503519da9a5e257e5ba0e11e39ca3811efa4aa48
 ---
 
 # Слияние записей
@@ -93,26 +93,24 @@ erDiagram
     customer ||--o{ customer_order : оформляет
     customer ||--o{ customer_address : имеет
     customer ||--o{ team_member : вступает
-    team ||--o{ team_member : включает
-    customer ||--o{ customer_external_ref : известен_как
     customer_merge ||--|{ customer_merge_change : записывает
     customer ||--o{ customer_merge : поглощён_или_остался
     customer {
         bigint customer_id PK
         text public_id UK
-        bigint merged_into FK "только живая запись"
-        boolean is_live UK "генерируется: merged_into IS NULL"
-        boolean target_live FK "генерируется: true после слияния"
+        bigint merged_into FK
+        boolean is_live UK "генерируется"
+        boolean target_live FK "генерируется"
     }
     customer_order {
         bigint order_id PK
         bigint customer_id FK
-        boolean customer_live FK "генерируется: всегда true"
+        boolean customer_live FK "всегда true"
     }
     customer_address {
         bigint address_id PK
         bigint customer_id FK
-        boolean is_default "один на клиента"
+        boolean is_default
     }
     team_member {
         bigint team_id PK, FK
@@ -126,13 +124,12 @@ erDiagram
     }
     customer_merge_change {
         bigint merge_id FK
-        text action "repoint, demote, adjust, drop"
+        text action
         jsonb row_key
         jsonb old_row
     }
     class customer accent
     class customer_merge,customer_merge_change accent
-    class team muted
 ```
 
 Каждая бизнесовая дочерняя таблица ссылается на пару `(customer_id, true)`, поэтому её строка может существовать только рядом с живым клиентом. Таблицы журнала намеренно ссылаются на обычный первичный ключ: им нужно указывать на поглощённые строки.

@@ -93,7 +93,7 @@ Each project and person can appear in many memberships. Each membership names ex
 - **`project`** identifies a project independently of its membership list.
 - **`person`** identifies a person independently of the projects they join.
 - **`project_member`** has one mandatory pair of existing endpoints. Its primary key prevents duplicate pairs; its foreign keys prevent orphans. `member_role` is a small example vocabulary enforced by a check.
-- **Deletion policy** removes memberships when their project is deleted, but rejects deleting a referenced person. PostgreSQL documents these [foreign-key actions](https://www.postgresql.org/docs/18/ddl-constraints.html#DDL-CONSTRAINTS-FK); choose them according to ownership, rather than applying cascades everywhere.
+- **Deletion policy** removes memberships when their project is deleted, but rejects deleting a referenced person. PostgreSQL documents these [foreign-key actions](https://www.postgresql.org/docs/18/ddl-constraints.html#DDL-CONSTRAINTS-FK); choose them according to ownership, rather than applying cascades everywhere; see [Dependent Table](dependent-table.md).
 
 ## When to use
 

@@ -100,7 +100,7 @@ Does another row represent membership, part of one entity, a user-controlled occ
 
 | Choice | Cardinality and ownership | Read or edit requirement | Integrity and maintenance cost |
 | --- | --- | --- | --- |
-| [Ordinary dependent FK](association-table.md) | Each child has one parent | No independent many-to-many link is needed | FK enforces parent existence; index navigation as needed |
+| [Dependent Table](dependent-table.md) | Each child has one parent; it is an owned part, a reference or an optional link | The parent's delete or re-key must have a declared effect on its children | The action follows the kind (CASCADE / RESTRICT or NO ACTION / SET NULL (cols)); index the referencing columns; batch large cascades |
 | [Association Table](association-table.md) | Many-to-many membership with link attributes | Query and edit individual links | Endpoint FKs and pair uniqueness; an extra ID does not replace the pair rule |
 | [Table Split](table-split.md) | At most one detail row per core row | Optional group, separate permissions or measured benefit from separate rows | Shared PK/FK; full reads join; mandatory circular variant needs deferred checks |
 | [Ordered Collection](ordered-collection.md) | Occurrences within one owner | Users insert or move items independently of creation time | Serialize collection edits; stable item identity differs from mutable position |

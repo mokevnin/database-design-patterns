@@ -44,7 +44,7 @@ You avoid FK probes and parent-key contention, or want imports to arrive in any 
 
 ## A better way
 
-Declare the intended relationship, including its nullability and deletion action. When a reference may be absent, make it nullable instead of pointing it at a placeholder row; see [Sentinel Rows](sentinel-rows.md). For orders that must retain their customer, use a mandatory FK with restrictive deletion. For dependent facts owned entirely by the parent, a cascade may be appropriate. PostgreSQL documents [these reference actions](https://www.postgresql.org/docs/18/ddl-constraints.html#DDL-CONSTRAINTS-FK); pick their business meaning before their convenience.
+Declare the intended relationship, including its nullability and deletion action. When a reference may be absent, make it nullable instead of pointing it at a placeholder row; see [Sentinel Rows](sentinel-rows.md). For orders that must retain their customer, use a mandatory FK with restrictive deletion. For dependent facts owned entirely by the parent, a cascade may be appropriate; [Dependent Table](dependent-table.md) matches each delete action to the kind of relationship. PostgreSQL documents [these reference actions](https://www.postgresql.org/docs/18/ddl-constraints.html#DDL-CONSTRAINTS-FK); pick their business meaning before their convenience.
 
 ### Alternatives and selection
 

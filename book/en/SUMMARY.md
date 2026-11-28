@@ -14,6 +14,7 @@
 
 ## Relationships
 
+* [Dependent Table](dependent-table.md)
 * [Association Table](association-table.md)
 * [Table Split](table-split.md)
 * [Ordered Collection](ordered-collection.md)

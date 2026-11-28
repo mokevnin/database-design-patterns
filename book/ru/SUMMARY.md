@@ -9,6 +9,7 @@
 * [Упорядоченный идентификатор](time-ordered-identifier.md)
 * [Публичный идентификатор](public-identifier.md)
 * [Внешняя ссылка](external-reference.md)
+* [Номер документа](document-number.md)
 * [Каноническое значение](canonical-value.md)
 * [Хешированный секрет](hashed-secret.md)
 

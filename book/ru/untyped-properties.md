@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Нетипизированные свойства хранят атрибуты как имя и текст, лишая базу обязательности, проверки типов и ссылок для отдельных полей.
 status: translated
 related: [typed-properties, json-column]
-source_rev: a584760a0960bd32079ab4e7c9ed12860899950c
+source_rev: a662e8fb5effc013a7c276fe488850a14e7b5837
 ---
 
 # Нетипизированные свойства

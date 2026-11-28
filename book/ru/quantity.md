@@ -2,7 +2,7 @@
 group: domain-structures
 status: translated
 related: [observation, inexact-arithmetic, double-entry-ledger]
-source_rev: 30a19f41c7484fde71a4e84d5bcba719672c4277
+source_rev: c01f7b359356622169e8ebe4fbaa2c6e59dfd165
 ---
 
 # Величина

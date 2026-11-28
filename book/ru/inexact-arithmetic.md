@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Неточная арифметика хранит деньги и точные десятичные величины в плавающей точке, нарушая ожидаемые бизнесом суммы и сравнения.
 status: translated
 related: [quantity, double-entry-ledger]
-source_rev: a584760a0960bd32079ab4e7c9ed12860899950c
+source_rev: a662e8fb5effc013a7c276fe488850a14e7b5837
 ---
 
 # Неточная арифметика

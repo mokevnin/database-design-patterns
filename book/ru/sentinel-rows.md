@@ -4,7 +4,7 @@ kind: anti-pattern
 description: Фиктивная строка вроде клиента 0 «Unknown» позволяет пройти обязательному внешнему ключу без данных и искажает подсчёты, соединения и доступ.
 status: translated
 related: [missing-foreign-keys, lookup-table, party, audit-log, expand-contract]
-source_rev: d39179a0daa7fd58a0c52658a1e8128dfc9777f4
+source_rev: 5017c040b9b5a6312eed1e03f28481f06dcf74a0
 ---
 
 # Строки-заглушки

@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Обязательные суррогаты дают каждой таблице генерируемый ID без уникальности бизнес-ключа, позволяя сохранить один факт дважды.
 status: translated
 related: [surrogate-key, natural-key, association-table]
-source_rev: 3e5c3bbc6bf676518c355fd8c4a9e5eabe21ed84
+source_rev: a662e8fb5effc013a7c276fe488850a14e7b5837
 ---
 
 # Обязательные суррогаты

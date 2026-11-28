@@ -2,7 +2,7 @@
 group: reference-and-state
 status: translated
 related: [status-history, version-column, history-table, bill-of-materials, audit-log]
-source_rev: cc2aa03c461fba9fb7a02e8410c664263c70980d
+source_rev: 8f41da7de71bb0506fc595da1be9341b153947f0
 ---
 
 # Предложенное изменение

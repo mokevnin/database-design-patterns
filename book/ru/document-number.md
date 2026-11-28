@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [surrogate-key, natural-key, public-identifier, time-ordered-identifier, soft-delete, status-history]
-source_rev: 30c6877404120920115c841a079e5246eb02e050
+source_rev: 7c8f9df00841d67ce5849e94a0c763f95e150462
 ---
 
 # Номер документа

@@ -2,7 +2,7 @@
 group: reliable-writes
 status: translated
 related: [reservation, status-history, ordered-collection]
-source_rev: bf5f6b7008ef32f3a7e21a153cde728c02db1e56
+source_rev: 4fa5b89bc0aa301d687a5e8a0596dbb9c34ae0c1
 ---
 
 # Столбец версии

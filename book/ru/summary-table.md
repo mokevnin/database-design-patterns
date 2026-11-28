@@ -2,7 +2,7 @@
 group: growth-and-change
 status: translated
 related: [double-entry-ledger, table-partitioning]
-source_rev: e8ba7df0fad3df1403b6722c0f4783db9a73bb2c
+source_rev: 2aee0cd4ce7cf4ed496e8f5934c1ce5b22d0ec31
 ---
 
 # Таблица итогов

@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [public-identifier, table-split, canonical-value, audit-log]
-source_rev: 1f7af16d9dc7b959fd5536b772d1b290be4cceee
+source_rev: 6f2e59733804dd12a550f5d0bdf7c7259c05659d
 ---
 
 # Хешированный секрет

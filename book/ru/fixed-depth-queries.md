@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Запросы фиксированной глубины обходят дерево заданным числом самосоединений и молча теряют все узлы глубже последнего соединения.
 status: translated
 related: [adjacency-list, closure-table]
-source_rev: a584760a0960bd32079ab4e7c9ed12860899950c
+source_rev: a662e8fb5effc013a7c276fe488850a14e7b5837
 ---
 
 # Фиксированная глубина

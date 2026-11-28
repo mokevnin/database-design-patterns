@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Список с разделителями хранит связь строкой в одном столбце, лишая базу проверки элементов, внешних ключей и обычного индекса принадлежности.
 status: translated
 related: [association-table, repeated-columns]
-source_rev: a584760a0960bd32079ab4e7c9ed12860899950c
+source_rev: a662e8fb5effc013a7c276fe488850a14e7b5837
 ---
 
 # Списки с разделителями

@@ -2,7 +2,7 @@
 group: growth-and-change
 status: translated
 related: [table-partitioning, table-split]
-source_rev: 0264f2aeb96f564e62dbacb0fb4103c0ddf69825
+source_rev: eaaa0d52b92bb1f706c869efba5c66bc888b9c0c
 ---
 
 # Расширение и свёртывание

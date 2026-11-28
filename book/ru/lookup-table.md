@@ -2,7 +2,7 @@
 group: reference-and-state
 status: translated
 related: [status-history, volatile-enums]
-source_rev: d39179a0daa7fd58a0c52658a1e8128dfc9777f4
+source_rev: 5017c040b9b5a6312eed1e03f28481f06dcf74a0
 ---
 
 # Таблица значений

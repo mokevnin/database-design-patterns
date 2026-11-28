@@ -2,7 +2,7 @@
 group: relationships
 status: translated
 related: [association-table, table-split, natural-key, exclusive-arc, missing-foreign-keys, soft-delete]
-source_rev:
+source_rev: b152c940c2c0ab82165cdcf5da1cb8fe9d04f10e
 ---
 
 # Зависимая таблица

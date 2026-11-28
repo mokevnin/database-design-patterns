@@ -237,7 +237,7 @@ sequenceDiagram
   Note over B: Roll back base row, resolve winner
 ```
 
-This detects only duplicates covered by the chosen registry key. Two records without comparable identifiers need an explicit matching and review process. For a merge, lock both parties in ascending ID order, reconcile conflicting details, repoint dependents and record the old-to-new mapping in one coordinated operation. Keep the old identity resolvable if external systems still use it.
+This detects only duplicates covered by the chosen registry key. Two records without comparable identifiers need an explicit matching and review process. Merging two parties that turn out to be the same is covered in [Record Merge](record-merge.md): lock both rows, re-point dependents in one transaction, keep the old ID resolvable and journal the merge so it can be undone.
 
 ## Migration
 

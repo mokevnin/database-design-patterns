@@ -113,7 +113,7 @@ One customer can be known as many foreign IDs: a live Stripe customer, a CRM rec
 - **`customer`** owns `customer_id`, a `GENERATED ALWAYS` identity. A direct insert of a foreign number into it fails with SQLSTATE `428C9`, so an import cannot quietly reuse a CRM ID as the local key.
 - **`customer_external_ref`** has the primary key `(system, scope, external_id)`: one foreign ID in one scope maps to one customer. The same string under another scope is a separate row, so a sandbox link never answers a live lookup. All three columns use the `C` collation; `customer_external_ref_id_present` rejects an empty ID. The index on `customer_id` serves the outbound lookup, "which Stripe customer do I charge?".
 - **`provider_event`** is a mirror: its primary key is the provider's scoped event ID, which is exactly the deduplication key a redelivery repeats.
-- **Link stability** is a write policy: once written, a row is not repointed by ordinary code. Moving a foreign ID to another customer and merging duplicate customers are a separate topic with their own protocol, not covered here.
+- **Link stability** is a write policy: once written, a row is not repointed by ordinary code. Moving a foreign ID to another customer and merging duplicate customers are a separate topic with their own protocol, see [Record Merge](record-merge.md).
 
 ## When to use
 

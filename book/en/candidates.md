@@ -12,4 +12,3 @@ Russian, English, and Spanish are welcome; participation requires a GitHub accou
 
 | Topic | Identifier | Discussion |
 |---|---|---|
-| Record Merge — merging duplicate records without losing references | `record-merge` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20record-merge%22) |

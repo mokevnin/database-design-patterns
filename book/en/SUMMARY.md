@@ -9,6 +9,7 @@
 * [Time-Ordered Identifier](time-ordered-identifier.md)
 * [Public Identifier](public-identifier.md)
 * [External Reference](external-reference.md)
+* [Record Merge](record-merge.md)
 * [Document Number](document-number.md)
 * [Canonical Value](canonical-value.md)
 * [Hashed Secret](hashed-secret.md)

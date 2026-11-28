@@ -2,7 +2,7 @@
 group: growth-and-change
 status: translated
 related: [double-entry-ledger, table-partitioning]
-source_rev: d2738bcefae78e452c0571c266a1138e6a27e583
+source_rev: e8ba7df0fad3df1403b6722c0f4783db9a73bb2c
 ---
 
 # Таблица итогов
@@ -350,3 +350,4 @@ stateDiagram-v2
 - [Запись идемпотентности](idempotency-record.md) не даёт повторённым командам или событиям применить ещё одну дельту.
 - [Транзакционный outbox](transactional-outbox.md) предоставляет надёжный асинхронный вход проекции.
 - [Расширение и свёртывание](expand-contract.md) разбивает развёртывание проекции и возврат на этапы.
+- [Зафиксированное значение](captured-value.md) копирует значение, которое никогда не должно следовать за источником, например цену в строке заказа; это факт, а не итог.

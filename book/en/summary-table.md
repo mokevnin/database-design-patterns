@@ -344,3 +344,4 @@ Keep source-based reads available through rollout. You can back out by returning
 - [Idempotency Record](idempotency-record.md) prevents replayed commands or events from applying another delta.
 - [Transactional Outbox](transactional-outbox.md) supplies durable asynchronous projection input.
 - [Expand and Contract](expand-contract.md) stages projection rollout and fallback.
+- [Captured Value](captured-value.md) copies a value that must never follow its source, such as an order line's price; it is a fact, not a summary.

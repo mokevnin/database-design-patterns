@@ -311,11 +311,11 @@ gantt
     dateFormat YYYY-MM-DD
     axisFormat %b %d
     section Series 1
-    Mondays 09:00 until the boundary :done, s1, 2026-03-16, 2026-04-20
+    Mondays at 9 until the boundary :done, s1, 2026-03-16, 2026-04-20
     section Series 5
-    Mondays 10:00 from the boundary :active, s5, 2026-04-20, 2026-06-30
-    Booking re-pointed to Apr 27 10:00 :milestone, bk, 2026-04-27, 0d
-    Cancellation re-keyed to May 4 10:00 :crit, ov, 2026-05-04, 1d
+    Mondays at 10 from the boundary :active, s5, 2026-04-20, 2026-06-30
+    Booking re-pointed to Apr 27 at 10 :milestone, bk, 2026-04-27, 0d
+    Cancellation re-keyed to May 4 at 10 :crit, ov, 2026-05-04, 1d
 ```
 
 The past part of series 1 is untouched, so attendance on April 6 and 13 still points to 09:00 occurrences. If the old series was bounded by `COUNT`, give the successor the remaining count: the old count minus the occurrences before the boundary. Overrides whose original start the new rule does not produce, for example after a change of weekday, cannot be shifted mechanically; list them for the organizer instead of dropping them.

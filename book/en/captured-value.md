@@ -74,14 +74,10 @@ Pinning and capturing reach the same guarantee by different routes. A pinned ref
 title: Facts copy what they used and keep references to where it came from
 ---
 erDiagram
-    customer ||--o{ sales_order : places
     product ||--o{ product_price : has_schedule
     sales_order ||--o{ order_line : contains
     product ||--o{ order_line : identifies
     product_price ||--o{ order_line : priced_from
-    sales_order ||--o{ order_adjustment : corrected_by
-    sales_order ||--o| order_conversion : reported_as
-    fx_quote ||--o{ order_conversion : rate_from
     product_price {
         bigint price_id UK
         bigint product_id PK,FK
@@ -91,39 +87,25 @@ erDiagram
     }
     sales_order {
         bigint order_id PK,UK
-        text currency UK "paired with order_id"
+        text currency UK
         date order_date
-        text state "draft or confirmed"
+        text state
         text billing_address "captured"
     }
     order_line {
         bigint order_id PK,FK
         integer line_no PK
         bigint price_id FK
-        text currency FK "order currency"
+        text currency FK
         text product_name "captured"
         numeric unit_price "captured"
         numeric tax_rate "captured"
     }
-    fx_quote {
-        bigint quote_id UK
-        text source PK
-        text base_currency PK
-        text quote_currency PK
-        daterange valid_at PK "WITHOUT OVERLAPS"
-        numeric rate
-    }
-    order_conversion {
-        bigint order_id PK,FK
-        bigint quote_id FK
-        numeric applied_rate "captured"
-        numeric converted_amount "generated"
-    }
-    class order_line,sales_order,order_conversion,order_adjustment accent
-    class product,product_price,fx_quote muted
+    class order_line,sales_order accent
+    class product,product_price muted
 ```
 
-The highlighted tables are facts; the muted ones are sources that keep changing. Every arrow from a source to a fact is a reference used for identity and provenance, never for reading the values the fact printed.
+The highlighted tables are facts; the muted ones are sources that keep changing. The exchange-rate tables, `fx_quote` and `order_conversion`, are shown with the currency variant below. Every arrow from a source to a fact is a reference used for identity and provenance, never for reading the values the fact printed.
 
 ## Tables and invariants
 

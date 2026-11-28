@@ -92,26 +92,24 @@ erDiagram
     customer ||--o{ customer_order : places
     customer ||--o{ customer_address : has
     customer ||--o{ team_member : joins
-    team ||--o{ team_member : has
-    customer ||--o{ customer_external_ref : is_known_as
     customer_merge ||--|{ customer_merge_change : records
     customer ||--o{ customer_merge : absorbed_or_survived
     customer {
         bigint customer_id PK
         text public_id UK
-        bigint merged_into FK "live survivor only"
-        boolean is_live UK "generated: merged_into IS NULL"
-        boolean target_live FK "generated: true when merged"
+        bigint merged_into FK
+        boolean is_live UK "generated"
+        boolean target_live FK "generated"
     }
     customer_order {
         bigint order_id PK
         bigint customer_id FK
-        boolean customer_live FK "generated: always true"
+        boolean customer_live FK "always true"
     }
     customer_address {
         bigint address_id PK
         bigint customer_id FK
-        boolean is_default "one per customer"
+        boolean is_default
     }
     team_member {
         bigint team_id PK, FK
@@ -125,13 +123,12 @@ erDiagram
     }
     customer_merge_change {
         bigint merge_id FK
-        text action "repoint, demote, adjust, drop"
+        text action
         jsonb row_key
         jsonb old_row
     }
     class customer accent
     class customer_merge,customer_merge_change accent
-    class team muted
 ```
 
 Every business child references the pair `(customer_id, true)`, so it can exist only next to a live customer. The journal tables reference the plain primary key on purpose: they must point at absorbed rows.

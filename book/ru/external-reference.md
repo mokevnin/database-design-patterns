@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [surrogate-key, natural-key, public-identifier, canonical-value, idempotency-record, party]
-source_rev: dfd6531e2c04c13ef73ae8256234c7206c38e7a1
+source_rev: d55fe2e9b6be69222a2d210c3b9b4021d303df48
 ---
 
 # Внешняя ссылка

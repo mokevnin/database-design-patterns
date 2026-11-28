@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Клонированные таблицы делят одно отношение на копии по периоду или клиенту, заставляя расширять список ключей, ограничений, прав и миграций.
 status: translated
 related: [table-partitioning, shared-schema]
-source_rev: a584760a0960bd32079ab4e7c9ed12860899950c
+source_rev: a662e8fb5effc013a7c276fe488850a14e7b5837
 ---
 
 # Клонированные таблицы

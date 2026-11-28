@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [surrogate-key, natural-key, time-ordered-identifier, mandatory-surrogates]
-source_rev: b386507ecf29c2c651f28772e1c7daea6eebb7a7
+source_rev: 94f75162fa7cb9ecbaf5f127f565d0202db95547
 ---
 
 # Публичный идентификатор

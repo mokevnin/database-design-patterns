@@ -2,7 +2,7 @@
 group: time-and-deletion
 status: translated
 related: [soft-delete, table-partitioning, history-table, summary-table, expand-contract]
-source_rev: fdff2fc4e7a86e2bc2af4b1fe9aade89e78d7a74
+source_rev: bea87b526668e35ef77e8651d57c994eba15af34
 ---
 
 # Архивная таблица

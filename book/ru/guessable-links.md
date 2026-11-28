@@ -4,7 +4,7 @@ kind: anti-pattern
 description: Угадываемая ссылка защищает объект только последовательным ID или его хешем, поэтому любой может вычислить ссылки на все остальные объекты.
 status: translated
 related: [hashed-secret, public-identifier, surrogate-key, time-ordered-identifier]
-source_rev: 1f7af16d9dc7b959fd5536b772d1b290be4cceee
+source_rev: 6f2e59733804dd12a550f5d0bdf7c7259c05659d
 ---
 
 # Угадываемые ссылки

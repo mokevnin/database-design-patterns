@@ -2,7 +2,7 @@
 group: appendices
 status: translated
 related: []
-source_rev: 68378dc5cd7f536a5bedc95b9bc0b121a9d05b24
+source_rev: d55fe2e9b6be69222a2d210c3b9b4021d303df48
 ---
 
 # Атлас решений

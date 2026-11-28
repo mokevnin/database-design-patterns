@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Изменчивые перечисления превращают бизнес-словарь в enum или CHECK, требуя миграции для каждого нового значения и не храня метаданные вывода из обращения.
 status: translated
 related: [lookup-table]
-source_rev: a584760a0960bd32079ab4e7c9ed12860899950c
+source_rev: a662e8fb5effc013a7c276fe488850a14e7b5837
 ---
 
 # Изменчивые перечисления

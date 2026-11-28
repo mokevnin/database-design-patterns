@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Повторяющиеся столбцы задают коллекцию местами tag1, tag2, tag3, фиксируя вместимость в схеме и разрешая повторы элементов.
 status: translated
 related: [association-table, delimited-lists]
-source_rev: a584760a0960bd32079ab4e7c9ed12860899950c
+source_rev: a662e8fb5effc013a7c276fe488850a14e7b5837
 ---
 
 # Повторяющиеся столбцы

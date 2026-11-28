@@ -2,7 +2,7 @@
 group: time-and-deletion
 status: translated
 related: [history-table, effective-dating, audit-log]
-source_rev: 0264f2aeb96f564e62dbacb0fb4103c0ddf69825
+source_rev: eaaa0d52b92bb1f706c869efba5c66bc888b9c0c
 ---
 
 # Битемпоральная таблица

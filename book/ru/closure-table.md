@@ -2,7 +2,7 @@
 group: hierarchies
 status: translated
 related: [adjacency-list, materialized-path, nested-sets, bill-of-materials]
-source_rev: 68378dc5cd7f536a5bedc95b9bc0b121a9d05b24
+source_rev: 552a9ab30667596ddf420b047febbba11e550862
 ---
 
 # Таблица замыканий

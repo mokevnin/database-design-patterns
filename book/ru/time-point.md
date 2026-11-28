@@ -2,7 +2,7 @@
 group: time-and-deletion
 status: translated
 related: [effective-dating, history-table, summary-table, lookup-table]
-source_rev: 1192fba71969c0b239bb907e4cd7c53ac9ac9715
+source_rev: c2fa05041f7a9c36cc0d873a27f51e2b50a61b0d
 ---
 
 # Момент времени

@@ -46,6 +46,7 @@
 * [Момент времени](time-point.md)
 * [Таблица истории](history-table.md)
 * [Период действия](effective-dating.md)
+* [Зафиксированное значение](captured-value.md)
 * [Битемпоральная таблица](bitemporal-table.md)
 * [Журнал аудита](audit-log.md)
 * [Мягкое удаление](soft-delete.md)

@@ -2,7 +2,7 @@
 group: time-and-deletion
 status: translated
 related: [effective-dating, bill-of-materials, summary-table, history-table, quantity, double-entry-ledger]
-source_rev:
+source_rev: e8ba7df0fad3df1403b6722c0f4783db9a73bb2c
 ---
 
 # Зафиксированное значение

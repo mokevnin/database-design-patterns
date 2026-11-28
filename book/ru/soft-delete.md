@@ -2,7 +2,7 @@
 group: time-and-deletion
 status: translated
 related: [history-table, audit-log]
-source_rev: b152c940c2c0ab82165cdcf5da1cb8fe9d04f10e
+source_rev: fdff2fc4e7a86e2bc2af4b1fe9aade89e78d7a74
 ---
 
 # Мягкое удаление
@@ -317,3 +317,4 @@ flowchart TB
 - [Столбец версии](version-column.md) отклоняет правки на основе устаревшей версии жизненного цикла.
 - [Отсутствующие внешние ключи](missing-foreign-keys.md) объясняет необходимость контроля физических связей.
 - [Расширение и свёртывание](expand-contract.md) подготавливает читателей до включения нового поведения записи.
+- [Архивная таблица](archive-table.md) переносит завершённые, а не удалённые строки из рабочих таблиц под собственный срок хранения.

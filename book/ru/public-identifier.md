@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [surrogate-key, natural-key, time-ordered-identifier, mandatory-surrogates]
-source_rev: 1f7af16d9dc7b959fd5536b772d1b290be4cceee
+source_rev: b386507ecf29c2c651f28772e1c7daea6eebb7a7
 ---
 
 # Публичный идентификатор
@@ -13,7 +13,7 @@ source_rev: 1f7af16d9dc7b959fd5536b772d1b290be4cceee
 
 ## Также известен как
 
-External ID; непрозрачный идентификатор объекта; идентификатор с префиксом, если представление подсказывает тип. В [статье Stripe об ID объектов](https://dev.to/stripe/designing-apis-for-humans-object-ids-3o5a) используются идентификаторы клиентов вида `cus_...`. Префикс описывает представление, но не задаёт границу авторизации.
+External ID; непрозрачный идентификатор объекта; идентификатор с префиксом, если представление подсказывает тип. Здесь External ID — исходящий идентификатор, который выдаёте вы; ID, выданный вам другой системой, — это [внешняя ссылка](external-reference.md). В [статье Stripe об ID объектов](https://dev.to/stripe/designing-apis-for-humans-object-ids-3o5a) используются идентификаторы клиентов вида `cus_...`. Префикс описывает представление, но не задаёт границу авторизации.
 
 ## Проблема
 

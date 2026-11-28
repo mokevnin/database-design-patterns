@@ -2,7 +2,7 @@
 group: domain-structures
 status: translated
 related: [role-object, shared-schema, audit-log, effective-dating, association-table, exclusive-arc]
-source_rev: 785c232aa7f76337e3ffbe90e08fb63a7f22d028
+source_rev: 503519da9a5e257e5ba0e11e39ca3811efa4aa48
 ---
 
 # Выдача прав
@@ -82,7 +82,7 @@ erDiagram
     }
     role {
         text role_code PK, UK
-        text duty_group UK "общая у конфликтующих ролей"
+        text duty_group UK
     }
     role_permission {
         text role_code PK, FK
@@ -92,9 +92,9 @@ erDiagram
         bigint assignment_id PK
         bigint user_id FK
         text role_code FK
-        text duty_group FK "копия из role"
+        text duty_group FK
         bigint org_id FK "задан всегда"
-        bigint project_id FK "NULL — вся организация"
+        bigint project_id FK
         tstzrange valid_during "полуоткрытый"
         bigint granted_by FK
         bigint revoked_by FK

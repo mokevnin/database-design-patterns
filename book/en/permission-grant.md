@@ -81,7 +81,7 @@ erDiagram
     }
     role {
         text role_code PK, UK
-        text duty_group UK "conflicting roles share it"
+        text duty_group UK
     }
     role_permission {
         text role_code PK, FK
@@ -91,9 +91,9 @@ erDiagram
         bigint assignment_id PK
         bigint user_id FK
         text role_code FK
-        text duty_group FK "copied from role"
+        text duty_group FK
         bigint org_id FK "always set"
-        bigint project_id FK "null means whole organization"
+        bigint project_id FK
         tstzrange valid_during "half-open"
         bigint granted_by FK
         bigint revoked_by FK

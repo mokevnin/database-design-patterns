@@ -2,7 +2,7 @@
 group: time-and-deletion
 status: translated
 related: [effective-dating, bill-of-materials, summary-table, history-table, quantity, double-entry-ledger]
-source_rev: 2aee0cd4ce7cf4ed496e8f5934c1ce5b22d0ec31
+source_rev: 503519da9a5e257e5ba0e11e39ca3811efa4aa48
 ---
 
 # Зафиксированное значение
@@ -75,14 +75,10 @@ flowchart TB
 title: Факты копируют то, что использовали, и хранят ссылки на источник
 ---
 erDiagram
-    customer ||--o{ sales_order : размещает
     product ||--o{ product_price : имеет_расписание
     sales_order ||--o{ order_line : содержит
     product ||--o{ order_line : идентифицирует
     product_price ||--o{ order_line : цена_из
-    sales_order ||--o{ order_adjustment : исправляется
-    sales_order ||--o| order_conversion : отражается_как
-    fx_quote ||--o{ order_conversion : курс_из
     product_price {
         bigint price_id UK
         bigint product_id PK,FK
@@ -92,39 +88,25 @@ erDiagram
     }
     sales_order {
         bigint order_id PK,UK
-        text currency UK "в паре с order_id"
+        text currency UK
         date order_date
-        text state "draft или confirmed"
+        text state
         text billing_address "зафиксировано"
     }
     order_line {
         bigint order_id PK,FK
         integer line_no PK
         bigint price_id FK
-        text currency FK "валюта заказа"
+        text currency FK
         text product_name "зафиксировано"
         numeric unit_price "зафиксировано"
         numeric tax_rate "зафиксировано"
     }
-    fx_quote {
-        bigint quote_id UK
-        text source PK
-        text base_currency PK
-        text quote_currency PK
-        daterange valid_at PK "WITHOUT OVERLAPS"
-        numeric rate
-    }
-    order_conversion {
-        bigint order_id PK,FK
-        bigint quote_id FK
-        numeric applied_rate "зафиксировано"
-        numeric converted_amount "генерируется"
-    }
-    class order_line,sales_order,order_conversion,order_adjustment accent
-    class product,product_price,fx_quote muted
+    class order_line,sales_order accent
+    class product,product_price muted
 ```
 
-Выделенные таблицы — факты, приглушённые — источники, которые продолжают меняться. Каждая связь от источника к факту — ссылка для идентичности и происхождения, а не для чтения значений, которые факт напечатал.
+Выделенные таблицы — факты, приглушённые — источники, которые продолжают меняться. Таблицы курсов, `fx_quote` и `order_conversion`, показаны ниже вместе с валютным вариантом. Каждая связь от источника к факту — ссылка для идентичности и происхождения, а не для чтения значений, которые факт напечатал.
 
 ## Таблицы и инварианты
 

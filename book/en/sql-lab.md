@@ -10,7 +10,7 @@ SQL Lab explains how to run the book's examples. Each chapter's full scripts liv
 
 ## What you need
 
-The 55 pattern and anti-pattern chapters each have one script at `book/assets/<slug>/<slug>.sql`. Each header records the PostgreSQL 18 minor release the script was checked on: 18.6 for most, 18.7 for the newest. Use a PostgreSQL 18 server and its `psql` client: examples include `uuidv7()`, temporal keys, PostgreSQL ranges, PL/pgSQL and `psql` backslash commands. Other engines' implementation notes in the chapters are porting guidance, not claims that these files run unchanged there.
+The 56 pattern and anti-pattern chapters each have one script at `book/assets/<slug>/<slug>.sql`. Each header records the PostgreSQL 18 minor release the script was checked on: 18.6 for most, 18.7 for the newest. Use a PostgreSQL 18 server and its `psql` client: examples include `uuidv7()`, temporal keys, PostgreSQL ranges, PL/pgSQL and `psql` backslash commands. Other engines' implementation notes in the chapters are porting guidance, not claims that these files run unchanged there.
 
 Use a disposable cluster with a superuser connection. Some examples create roles, change privileges and install the supplied `ltree` or `btree_gist` extensions. Canonical Value creates an ICU collation, so the server must be built with ICU support. The tenant examples also create passwordless login roles, and Database per Tenant creates `dt_a` and `dt_b` and reconnects as its runtime roles. Those reconnects require the lab's local trust authentication. A fresh database alone does not isolate cluster-wide roles or those extra databases.
 
@@ -147,11 +147,11 @@ docker exec \
   ddp-sql-lab sh /book/book/assets/sql-lab/run-all.sh
 ```
 
-The runner discovers `book/assets/*/*.sql` in pathname order, independently of your working directory. For each file it creates a uniquely named database from `template0`, runs `psql -X -v ON_ERROR_STOP=1`, drops the database and prints `PASS <slug>`. It stops at the first nonzero script exit and prints `FAIL <slug>`; its exit trap attempts cleanup on failure or interruption. Cleanup failures also fail the run. With all current files passing, the final line is `PASS: 55 scripts`.
+The runner discovers `book/assets/*/*.sql` in pathname order, independently of your working directory. For each file it creates a uniquely named database from `template0`, runs `psql -X -v ON_ERROR_STOP=1`, drops the database and prints `PASS <slug>`. It stops at the first nonzero script exit and prints `FAIL <slug>`; its exit trap attempts cleanup on failure or interruption. Cleanup failures also fail the run. With all current files passing, the final line is `PASS: 56 scripts`.
 
 The runner also removes the tenant labs' auxiliary databases (`dt_a`, `dt_b`) and roles (`ss_app`, `st_owner`, `st_app_a`, `st_app_b`, `dt_owner`, `dt_app_a`, `dt_app_b`). Audit Log creates `audit_example_app` inside a transaction that rolls back. A preflight check rejects any of these existing names before running anything; it does not reuse or delete pre-existing lab objects. Run only one suite at a time in its disposable cluster. After an uncatchable termination or a cleanup failure, discard that cluster and start another.
 
-The complete suite has been run successfully on a throwaway PostgreSQL 18.7 cluster: all 55 files passed with these checks enabled. The outbox lab assumes a broker acknowledgement in SQL rather than contacting a broker; queue and reservation examples advance test state instead of waiting for real worker deadlines.
+The complete suite has been run successfully on a throwaway PostgreSQL 18.7 cluster: all 56 files passed with these checks enabled. The outbox lab assumes a broker acknowledgement in SQL rather than contacting a broker; queue and reservation examples advance test state instead of waiting for real worker deadlines.
 
 ## Script catalog
 
@@ -259,6 +259,7 @@ The groups and chapter order below follow the book's [Summary](SUMMARY.md). Each
 | [Delimited Lists](delimited-lists.md) | [delimited-lists.sql](../assets/delimited-lists/delimited-lists.sql) | Expose substring mistakes, parse imported members and quarantine unknown IDs. |
 | [Mandatory Surrogates](mandatory-surrogates.md) | [mandatory-surrogates.sql](../assets/mandatory-surrogates/mandatory-surrogates.sql) | Repair pair identity while retaining an old-ID map and showing the unique-pair alternative. |
 | [Missing Foreign Keys](missing-foreign-keys.md) | [missing-foreign-keys.sql](../assets/missing-foreign-keys/missing-foreign-keys.sql) | Quarantine orphans, enforce new references and validate existing rows. |
+| [Sentinel Rows](sentinel-rows.md) | [sentinel-rows.sql](../assets/sentinel-rows/sentinel-rows.sql) | Show a placeholder customer topping the ranking and leaking orders to a login, then map references to NULL plus a reason and retire the rows. |
 | [Repeated Columns](repeated-columns.md) | [repeated-columns.sql](../assets/repeated-columns/repeated-columns.sql) | Unpivot numbered slots into constrained membership rows. |
 | [Polymorphic Associations](polymorphic-associations.md) | [polymorphic-associations.sql](../assets/polymorphic-associations/polymorphic-associations.sql) | Replace unchecked kind/ID values with a validated exclusive arc. |
 | [Untyped Properties](untyped-properties.md) | [untyped-properties.sql](../assets/untyped-properties/untyped-properties.sql) | Audit conversions, quarantine invalid properties and populate typed constrained columns. |

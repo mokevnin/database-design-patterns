@@ -266,6 +266,7 @@ Switch each dependent only after every old reference has one mapped target. Duri
 - Deduplicating people by name or globally unique email without a domain rule supporting it.
 - Claiming exactly-one extension from the child foreign keys; this schema intentionally allows no details.
 - Treating every typed party relationship as a valid tree or legally meaningful relationship without its own rules.
+- Creating a placeholder party such as `Unknown customer` for missing counterparties; see [Sentinel Rows](sentinel-rows.md).
 
 ## Known uses
 

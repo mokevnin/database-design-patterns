@@ -183,6 +183,8 @@ These are independent alternative tables, each with a UUID primary key. A real c
 
 ### Customer IDs from two systems
 
+Never use an ID assigned by an external system as the primary key of your own customer table. Even with a single CRM today, you store orders against a customer whose history must survive a change of provider. Give the customer a local primary key. When you replace the CRM, link its new ID to the same customer and keep the references in existing orders intact.
+
 Your CRM sends customer `42`. Your billing system also sends customer `42`, but the numbers come from independent sequences. Looking up the number alone could post an invoice to the wrong account. Keep each source’s identifier as text (including any leading zeros) and qualify it with the system that issued it.
 
 ```sql

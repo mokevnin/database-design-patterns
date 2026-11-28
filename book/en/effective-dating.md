@@ -65,7 +65,7 @@ One product has many dated prices, but at most one matches a given date. Referen
 - **`product`** supplies stable identity and a lock target even when no price exists yet.
 - **`price`** requires a nonempty period through the temporal primary key, a bounded lower end through its check, and a nonnegative amount. The key enforces no overlap per product. PostgreSQL documents that [`WITHOUT OVERLAPS` uses GiST exclusion semantics](https://www.postgresql.org/docs/18/sql-createtable.html).
 - **Coverage** is not a table-wide invariant in this schema. The demonstrated split preserves the original interval's coverage; a direct delete could create a gap.
-- **Date granularity** is a domain choice: this example prices whole business dates. Use a timezone policy and timestamp ranges for intraday changes rather than silently casting timestamps to dates.
+- **Date granularity** is a domain choice: this example prices whole business dates. Use a zone policy and timestamp ranges for intraday changes, as described in [Time Point](time-point.md), rather than silently casting timestamps to dates.
 
 ## When to use
 

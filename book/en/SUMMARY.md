@@ -41,6 +41,7 @@
 
 ## Time and Deletion
 
+* [Time Point](time-point.md)
 * [History Table](history-table.md)
 * [Effective Dating](effective-dating.md)
 * [Bitemporal Table](bitemporal-table.md)

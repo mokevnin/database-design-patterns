@@ -35,7 +35,7 @@ INSERT INTO customer_order VALUES (107, 0, 220.00);
 SELECT count(*) = 4 AS valid FROM customer_order WHERE customer_id = 0 \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- A shared kiosk login was linked to the fake customer and sees every guest order.
@@ -45,7 +45,7 @@ FROM customer_order AS o JOIN customer_login AS l USING (customer_id)
 WHERE l.login = 'kiosk' \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Guest orders inherit the attributes someone gave the fake customer.
@@ -53,7 +53,7 @@ SELECT (SELECT c.credit_limit FROM customer_order AS o JOIN customer AS c USING 
         WHERE o.order_id = 104) = 1000.00 AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- The fake customer becomes the biggest customer.
@@ -64,7 +64,7 @@ SELECT (SELECT c.name FROM customer_order AS o JOIN customer AS c USING (custome
         GROUP BY c.name ORDER BY sum(o.total) DESC LIMIT 1) = 'Unknown' AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- A second team adds its own placeholder; the old filter does not know about it.
@@ -73,13 +73,13 @@ INSERT INTO customer_order VALUES (108, -1, 90.00);
 SELECT count(DISTINCT customer_id) = 4 AS valid FROM customer_order \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 SELECT count(DISTINCT customer_id) = 3 AS valid
 FROM customer_order WHERE customer_id <> 0 \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Code that finds the placeholder by its label breaks when someone renames it.
@@ -90,7 +90,7 @@ FROM customer_order AS o JOIN customer AS c USING (customer_id)
 WHERE c.name = 'Unknown' \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 ROLLBACK TO SAVEPOINT renamed;
 
@@ -104,7 +104,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Migration step 1: inventory every reference to the customer table.
@@ -118,7 +118,7 @@ FROM pg_constraint
 WHERE contype = 'f' AND confrelid = 'customer'::regclass \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Migration step 2: name what each magic row meant.
@@ -145,7 +145,7 @@ VALUES (121, NULL, 10.00, 'not_provided');
 SELECT count(*) = 2 AS valid FROM customer_order WHERE order_id IN (120, 121) \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 ROLLBACK TO SAVEPOINT compatibility_window;
 
@@ -163,7 +163,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Migration step 5: map references to NULL plus a reason; remove access grants.
@@ -184,7 +184,7 @@ SELECT (SELECT count(*) FROM customer) = 2
         WHERE conrelid = 'customer_order'::regclass AND contype = 'c') AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- After: the customer ranking contains customers only.
@@ -196,7 +196,7 @@ SELECT (SELECT c.name FROM customer_order AS o JOIN customer AS c USING (custome
    AND (SELECT count(DISTINCT customer_id) FROM customer_order) = 2 AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Unattributed revenue is reported separately, by reason, and nothing is lost.
@@ -209,7 +209,7 @@ SELECT (SELECT sum(total) FROM customer_order WHERE customer_missing_reason = 'n
    AND (SELECT sum(total) FROM customer_order) = 1990.00 AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- The kiosk login no longer sees anyone's orders.
@@ -218,7 +218,7 @@ FROM customer_order AS o JOIN customer_login AS l USING (customer_id)
 WHERE l.login = 'kiosk' \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- A guest order is accepted with a reason.
@@ -235,7 +235,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- A customer and a reason together are rejected.
@@ -249,7 +249,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- A reason outside the vocabulary is rejected.
@@ -263,7 +263,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- A magic ID is rejected by the guard.
@@ -276,7 +276,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- NULL has its own trap: inequality drops absent customers, IS DISTINCT FROM keeps them.
@@ -284,7 +284,7 @@ SELECT (SELECT count(*) FROM customer_order WHERE customer_id <> 1) = 1
    AND (SELECT count(*) FROM customer_order WHERE customer_id IS DISTINCT FROM 1) = 7 AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Alternative: absence is a state of the owning row, legal only while a quote is a draft.
@@ -304,7 +304,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 UPDATE quote SET status = 'issued', customer_id = 2 WHERE quote_id = 1;
 
@@ -332,7 +332,7 @@ SELECT (SELECT count(*) FROM price_change AS p JOIN actor AS a USING (actor_id)
    AND (SELECT count(*) FROM price_change) = 2 AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 ROLLBACK;

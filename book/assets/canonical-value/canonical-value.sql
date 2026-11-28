@@ -28,7 +28,7 @@ FROM app_user
 WHERE email IN ('Bob@Example.COM', U&'J\00FCrgen@example.de') \gset
 \if :stored_as_entered
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Same address in a different case.
@@ -41,7 +41,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Same address with a decomposed u-umlaut and different case.
@@ -54,14 +54,14 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Full folding is a policy decision: sharp s folds to "ss".
 SELECT canonical_email_v1('STRAßE@example.de') = 'strasse@example.de' AS full_folding \gset
 \if :full_folding
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Idempotent sign-up: the conflict target is the canonical column.
@@ -113,7 +113,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Migration: a legacy table whose plain unique constraint let variants in.
@@ -142,7 +142,7 @@ ROLLBACK TO SAVEPOINT expected_error;
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Resolve the collision (here: user 2 was a duplicate sign-up), then enforce.
@@ -153,7 +153,7 @@ CREATE UNIQUE INDEX legacy_user_email_key_idx
 SELECT count(*) = 2 AS migrated FROM legacy_user \gset
 \if :migrated
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 ROLLBACK;

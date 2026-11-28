@@ -53,7 +53,7 @@ SELECT (SELECT business_day = DATE '2026-03-02' FROM time_example.sale
         WHERE sale_id = 10) AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- The stored instant does not depend on the session time zone; its display does.
@@ -62,7 +62,7 @@ SELECT occurred_at::text = '2026-03-01 18:30:00-05' AS valid
 FROM time_example.sale WHERE sale_id = 10 \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 SET LOCAL TIME ZONE 'UTC';
 
@@ -73,7 +73,7 @@ SELECT (SELECT occurred_at = TIMESTAMPTZ '2026-03-29 10:00:00.124+00'
         FROM time_example.sale WHERE sale_id = 11) AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- A local business day is a half-open range of instants; it is not always 24 hours.
@@ -84,7 +84,7 @@ SELECT (DATE '2026-03-30'::timestamp AT TIME ZONE 'Europe/Berlin')
    AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 SELECT count(*) = 1 AS valid
 FROM time_example.sale
@@ -92,7 +92,7 @@ WHERE occurred_at >= DATE '2026-03-29'::timestamp AT TIME ZONE 'Europe/Berlin'
   AND occurred_at <  DATE '2026-03-30'::timestamp AT TIME ZONE 'Europe/Berlin' \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Wall-clock times that do not exist or occur twice are resolved, not rejected.
@@ -102,7 +102,7 @@ SELECT TIMESTAMP '2026-03-29 02:30' AT TIME ZONE 'Europe/Berlin'
          = TIMESTAMPTZ '2026-10-25 01:30:00+00' AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- Calendar arithmetic follows the session zone: a day is not 24 hours across a transition.
@@ -113,7 +113,7 @@ SELECT TIMESTAMPTZ '2026-03-28 12:00+01' + interval '1 day'
          = TIMESTAMPTZ '2026-03-29 13:00+02' AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 SET LOCAL TIME ZONE 'UTC';
 
@@ -124,7 +124,7 @@ SELECT (SELECT starts_at = TIMESTAMPTZ '2027-04-01 07:00:00+00'
         FROM time_example.appointment_instant WHERE appointment_id = 20) AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- An unknown zone name is rejected by the reference, not discovered at read time.
@@ -138,7 +138,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- The generated business day cannot be written directly.
@@ -151,7 +151,7 @@ ROLLBACK TO SAVEPOINT rejected_operation;
 SELECT :'rejected_state' = '428C9' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- now() is the transaction start; clock_timestamp() keeps moving.
@@ -160,7 +160,7 @@ SELECT now() = transaction_timestamp()
    AND clock_timestamp() > now() AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 ROLLBACK;
@@ -177,6 +177,6 @@ SELECT pg_relation_filenode('legacy_event') = :before_node
    AS valid \gset
 \if :valid
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 ROLLBACK;

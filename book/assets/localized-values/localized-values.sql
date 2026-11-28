@@ -52,7 +52,7 @@ INSERT INTO product_text VALUES (1, 'fr', 'Autre chaise');
 SELECT :'rejected_state' = '23505' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- This rejection is intentional; verify it and continue.
@@ -65,7 +65,7 @@ COMMIT;
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 DO $$ BEGIN
@@ -80,7 +80,7 @@ DELETE FROM product_text WHERE product_id = 1 AND locale = 'en';
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 
 -- This rejection is intentional; verify it and continue.
@@ -91,7 +91,7 @@ INSERT INTO product_text VALUES (1, 'fr-ca', '   ');
 SELECT :'rejected_state' = '23514' AS rejected \gset
 \if :rejected
 \else
-    \quit 1
+    SELECT 1 / 0 AS assertion_failed;
 \endif
 CREATE INDEX product_text_en_search_idx ON product_text
     USING gin (to_tsvector('english'::regconfig, name)) WHERE locale = 'en';

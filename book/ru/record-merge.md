@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [party, external-reference, dependent-table, surrogate-key, public-identifier, audit-log, soft-delete, canonical-value]
-source_rev: 503519da9a5e257e5ba0e11e39ca3811efa4aa48
+source_rev: 846b7fcf8fb4669c110542c3235a5a4a15d9fad1
 ---
 
 # Слияние записей

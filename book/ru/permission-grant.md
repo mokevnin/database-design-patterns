@@ -2,7 +2,7 @@
 group: domain-structures
 status: translated
 related: [role-object, shared-schema, audit-log, effective-dating, association-table, exclusive-arc]
-source_rev: 503519da9a5e257e5ba0e11e39ca3811efa4aa48
+source_rev: 846b7fcf8fb4669c110542c3235a5a4a15d9fad1
 ---
 
 # Выдача прав

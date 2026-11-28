@@ -2,7 +2,7 @@
 group: domain-structures
 status: translated
 related: [quantity, summary-table, idempotency-record, inexact-arithmetic]
-source_rev: 04657723f383dd24d4bb76d6d0c6342967c32cd0
+source_rev: 1a7729ca2ba57b6de32d00d4efc8dba24acacbd6
 ---
 
 # Двойная запись

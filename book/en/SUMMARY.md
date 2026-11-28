@@ -25,6 +25,7 @@
 
 * [Lookup Table](lookup-table.md)
 * [Status History](status-history.md)
+* [Proposed Change](proposed-change.md)
 
 ## Hierarchies
 

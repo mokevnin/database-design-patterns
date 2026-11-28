@@ -314,3 +314,4 @@ The baseline shares order locks with live moves, preventing a stale snapshot fro
 - [Version Column](version-column.md) supplies the stale-command check or an optimistic write alternative.
 - [Idempotency Record](idempotency-record.md) resolves retries after uncertain commits.
 - [Expand and Contract](expand-contract.md) provides the rollout structure for replacing uncontrolled status writes.
+- [Proposed Change](proposed-change.md) holds a requested change until a second person approves it, then applies it against the version it was based on.

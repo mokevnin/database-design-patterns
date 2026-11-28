@@ -224,3 +224,4 @@ Keep a rollback-compatible writer that still advances versions even if the UI st
 - [Ordered Collection](ordered-collection.md) can use one parent token for a displayed ordering.
 - [Idempotency Record](idempotency-record.md) recovers a command's result after a lost response.
 - [Expand and Contract](expand-contract.md) coordinates old writers and new preconditions.
+- [Proposed Change](proposed-change.md) keeps the token in a pending proposal, so an approved change applied later cannot overwrite a newer value.

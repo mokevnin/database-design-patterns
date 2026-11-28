@@ -14,7 +14,6 @@ Russian, English, and Spanish are welcome; participation requires a GitHub accou
 |---|---|---|
 | Record Merge — merging duplicate records without losing references | `record-merge` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20record-merge%22) |
 | File Reference — files outside the database and their metadata rows | `file-reference` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20file-reference%22) |
-| Proposed Change — drafts and changes that need approval | `proposed-change` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20proposed-change%22) |
 | Graph Edges — general many-to-many links within one table | `graph-edges` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20graph-edges%22) |
 | Recurrence Rule — repeating events with exceptions | `recurrence-rule` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20recurrence-rule%22) |
 | Archive Table — moving old closed data out of live tables | `archive-table` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20archive-table%22) |

@@ -174,7 +174,7 @@ docker exec \
 | Глава | Скрипт | Демонстрация |
 | --- | --- | --- |
 | [Таблица связей](association-table.md) | [association-table.sql](../assets/association-table/association-table.sql) | Атрибуты участия, уникальность пары, FK концов и каскадные эффекты. |
-| [Разделение таблицы](table-split.md) | [table-split.sql](../assets/table-split/table-split.sql) | Необязательные детали с общим ключом и отложенный вариант обязательного расширения. |
+| [Разделение таблицы](table-split.md) | [table-split.sql](../assets/table-split/table-split.sql) | Необязательные детали с общим ключом, отложенный вариант обязательного расширения и стираемые персональные данные. |
 | [Упорядоченная коллекция](ordered-collection.md) | [ordered-collection.sql](../assets/ordered-collection/ordered-collection.sql) | Позиции с промежутками, перенумерация, обмен и уникальность в пределах владельца. |
 | [Локализованные значения](localized-values.md) | [localized-values.sql](../assets/localized-values/localized-values.sql) | Строки переводов, обязательный перевод по умолчанию, его атомарная смена и поиск по языку. |
 
@@ -214,7 +214,7 @@ docker exec \
 | [Период действия](effective-dating.md) | [effective-dating.sql](../assets/effective-dating/effective-dating.sql) | Непересекающиеся бизнес-периоды, выбор на момент времени и ссылки с временным покрытием. |
 | [Битемпоральная таблица](bitemporal-table.md) | [bitemporal-table.sql](../assets/bitemporal-table/bitemporal-table.sql) | Исправление бизнес-истории с сохранением прежних записанных представлений и защитой от пересечений. |
 | [Журнал аудита](audit-log.md) | [audit-log.sql](../assets/audit-log/audit-log.sql) | Атомарные действия с авторством и рабочие разрешения, запрещающие переписывать свидетельства. |
-| [Мягкое удаление](soft-delete.md) | [soft-delete.sql](../assets/soft-delete/soft-delete.sql) | Уникальность живых строк, сохранённые ссылки, конфликт восстановления и защита от физического удаления. |
+| [Мягкое удаление](soft-delete.md) | [soft-delete.sql](../assets/soft-delete/soft-delete.sql) | Уникальность живых строк, сохранённые ссылки, конфликт восстановления, защита от физического удаления и восстановление агрегата по операции удаления. |
 
 ### Структуры предметной области
 
@@ -222,7 +222,7 @@ docker exec \
 | --- | --- | --- |
 | [Участник](party.md) | [party.sql](../assets/party/party.sql) | Общая идентичность контрагента, типизированные расширения и уникальность регистрации. |
 | [Объект роли](role-object.md) | [role-object.sql](../assets/role-object/role-object.sql) | Датированные эпизоды участия, типизированные ссылки на роли и отклонение конфликтующих периодов. |
-| [Величина](quantity.md) | [quantity.sql](../assets/quantity/quantity.sql) | Совместимые пересчёты множителями, проверка размерности и отказ в пересчёте валют. |
+| [Величина](quantity.md) | [quantity.sql](../assets/quantity/quantity.sql) | Совместимые пересчёты множителями, проверка размерности, отказ в пересчёте валют и встроенная величина, полная или отсутствующая целиком. |
 | [Наблюдение](observation.md) | [observation.sql](../assets/observation/observation.sql) | Неизменяемые типизированные свидетельства, замены, отклонения и вычисляемый статус наблюдения. |
 | [Состав изделия](bill-of-materials.md) | [bill-of-materials.sql](../assets/bill-of-materials/bill-of-materials.sql) | Выпуск/закрепление версий рецептуры, развёртка количеств путей и выбор выпуска по бизнес-дате. |
 | [Двойная запись](double-entry-ledger.md) | [double-entry-ledger.sql](../assets/double-entry-ledger/double-entry-ledger.sql) | Сбалансированная атомарная запись, неизменяемые проводки, проверки валюты и точное сторнирование. |

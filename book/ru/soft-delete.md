@@ -2,7 +2,7 @@
 group: time-and-deletion
 status: translated
 related: [history-table, audit-log]
-source_rev: 7ec9a96d4beed448eaae1c404f7cc9bc43e58d0a
+source_rev: 30a19f41c7484fde71a4e84d5bcba719672c4277
 ---
 
 # Мягкое удаление
@@ -86,7 +86,7 @@ erDiagram
 
 ## Реализация
 
-[Полный скрипт PostgreSQL 18.6](../assets/soft-delete/soft-delete.sql) проверяет видимость, сохранённые ссылки, конфликт восстановления, архивную альтернативу и запрет физического удаления:
+[Полный скрипт PostgreSQL 18.7](../assets/soft-delete/soft-delete.sql) проверяет видимость, сохранённые ссылки, конфликт восстановления, архивную альтернативу, запрет физического удаления и восстановление агрегата по операции удаления:
 
 ```sql
 CREATE SCHEMA soft_example;
@@ -127,7 +127,7 @@ JOIN soft_example.customer AS c USING (customer_id);
 UPDATE soft_example.customer SET deleted_at = NULL WHERE customer_id = 1;
 ```
 
-PostgreSQL 18.6 возвращает SQLSTATE `23505`: `ERROR: duplicate key value violates unique constraint "customer_live_email_key"`, с уточнением `DETAIL: Key (email)=(alex@example.com) already exists.` Решите, должен ли пользователь изменить email, отменить новую регистрацию, объединить идентичности отдельным процессом или отказаться от восстановления. Не разрешайте конфликт молчаливым переносом ссылок счетов.
+PostgreSQL 18.7 возвращает SQLSTATE `23505`: `ERROR: duplicate key value violates unique constraint "customer_live_email_key"`, с уточнением `DETAIL: Key (email)=(alex@example.com) already exists.` Решите, должен ли пользователь изменить email, отменить новую регистрацию, объединить идентичности отдельным процессом или отказаться от восстановления. Не разрешайте конфликт молчаливым переносом ссылок счетов.
 
 ```mermaid
 ---
@@ -151,6 +151,50 @@ stateDiagram-v2
 ```
 
 Окончательная очистка находится за пределами обратимого жизненного цикла. Одна метка удаления не сообщает процессу восстановления, какие потомки удалены независимо, а какие скрыты как часть операции над родителем.
+
+Для агрегата записывайте удаление как операцию и помечайте её ID каждую строку, которую она скрывает. Проект владеет задачами; удаление проекта скрывает его и ещё живые задачи под одним `deletion_id`, а задача, удалённая раньше, сохраняет свой:
+
+```sql
+CREATE TABLE soft_example.deletion (
+    deletion_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    deleted_at timestamptz NOT NULL DEFAULT clock_timestamp()
+);
+CREATE TABLE soft_example.project (
+    project_id bigint PRIMARY KEY,
+    deletion_id bigint REFERENCES soft_example.deletion (deletion_id)
+);
+CREATE TABLE soft_example.task (
+    task_id bigint PRIMARY KEY,
+    project_id bigint NOT NULL REFERENCES soft_example.project (project_id),
+    deletion_id bigint REFERENCES soft_example.deletion (deletion_id)
+);
+WITH op AS (INSERT INTO soft_example.deletion DEFAULT VALUES RETURNING deletion_id),
+     hidden_project AS (
+         UPDATE soft_example.project SET deletion_id = (SELECT deletion_id FROM op)
+         WHERE project_id = 1 AND deletion_id IS NULL RETURNING project_id)
+UPDATE soft_example.task SET deletion_id = (SELECT deletion_id FROM op)
+WHERE project_id IN (SELECT project_id FROM hidden_project) AND deletion_id IS NULL;
+```
+
+Восстановление этой операции очищает ровно те строки, которые несут её ID: `UPDATE ... SET deletion_id = NULL WHERE deletion_id = :op` в таблицах проектов и задач в одной транзакции. Скрипт проверяет, что задача, удалённая до проекта, остаётся удалённой после его возвращения. Строка удаления — также естественное место для автора и причины или для ссылки на событие [журнала аудита](audit-log.md). Восстановление отдельного потомка, пока родитель скрыт, должна отклонять сама операция восстановления: схема лишь хранит пометки и не сравнивает их между таблицами.
+
+```mermaid
+---
+title: ID операции удаления восстанавливает ровно то, что она скрыла
+---
+sequenceDiagram
+    participant U as Пользователь
+    participant P as Проект 1
+    participant T as Задачи 10 и 11
+    U->>T: Удаление только задачи 11, операция 1
+    U->>P: Удаление проекта 1, операция 2
+    P->>T: Скрыть ещё живую задачу 10 операцией 2
+    U->>P: Восстановление операции 2
+    P->>T: Снять операцию 2 только с задачи 10
+    Note over T: Задача 11 сохраняет операцию 1 и остаётся удалённой
+```
+
+Метка времени может провести эту границу только сравнением на равенство, и такая догадка ломается, когда два удаления выполняются в одной транзакции и получают одинаковый `now()` или когда один каскад проставлен несколькими показаниями часов. В этой схеме пометкой служит `deletion_id`, а не `deleted_at`, поэтому представления живых строк и частичные уникальные индексы проверяют `deletion_id IS NULL`.
 
 Если нужна копия для восстановления, но предпочтительно физическое удаление из действующей таблицы, используйте архив. Пример архивирует клиента `2`, у которого нет счетов, одним оператором через [`DELETE ... RETURNING`](https://www.postgresql.org/docs/18/sql-delete.html) и [изменяющее данные CTE](https://www.postgresql.org/docs/18/queries-with.html#QUERIES-WITH-MODIFYING):
 

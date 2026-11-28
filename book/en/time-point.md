@@ -26,7 +26,7 @@ Classify every temporal column before choosing its type:
 
 - **Instant** — something happened or was recorded: `timestamptz`. PostgreSQL stores an absolute moment and renders it in the session's `TimeZone`; the offset you typed is not kept.
 - **Civil date** — a birthday, a due date, a business day: `date`. It is not midnight anywhere. When you derive it from an instant, derive it in a declared zone and store the zone you used.
-- **Future wall-clock time** — an appointment, an opening hour, a scheduled publication: a local `timestamp` plus an IANA zone name such as `Europe/Berlin`, not a fixed offset. Compute the instant when you need it, using the zone's rules in force at that moment.
+- **Future wall-clock time** — an appointment, an opening hour, a scheduled publication: a local `timestamp` plus an IANA zone name such as `Europe/Berlin`, not a fixed offset. Compute the instant when you need it, using the zone's rules in force at that moment. A repeating promise of this kind is a [Recurrence Rule](recurrence-rule.md).
 - **Elapsed duration** — `interval` or an integer in a declared unit, never the difference of two local times.
 
 Make precision part of the type (`timestamptz(3)` when clients carry milliseconds), keep ranges half-open, and name the clock each column records: transaction start (`now()`), the moment of the call (`clock_timestamp()`), or an occurrence time supplied by the caller.

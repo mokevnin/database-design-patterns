@@ -293,3 +293,4 @@ Switch every acquisition and release path to the shared resource protocol before
 - [Double-Entry Ledger](double-entry-ledger.md) records conserved stock or money movements.
 - [Inexact Arithmetic](inexact-arithmetic.md) explains why exact counts need exact representation.
 - [Edit Lock](edit-lock.md) holds an exclusive right to edit rather than capacity.
+- [Recurrence Rule](recurrence-rule.md) produces the concrete occurrences that recurring bookings claim.

@@ -50,6 +50,7 @@
 * [Time Point](time-point.md)
 * [History Table](history-table.md)
 * [Effective Dating](effective-dating.md)
+* [Recurrence Rule](recurrence-rule.md)
 * [Captured Value](captured-value.md)
 * [Bitemporal Table](bitemporal-table.md)
 * [Audit Log](audit-log.md)

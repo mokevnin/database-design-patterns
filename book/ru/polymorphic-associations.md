@@ -3,7 +3,7 @@ kind: anti-pattern
 description: Полиморфная связь хранит тип цели и ID без внешнего ключа, поэтому база не может доказать существование целевой строки.
 status: translated
 related: [exclusive-arc, class-table-inheritance, missing-foreign-keys]
-source_rev: 31edb231a2648b7eb5591b4f61fe9eeaead1a41e
+source_rev: 9ff4b21656c408eb755e07d44be7375e224ebaf5
 ---
 
 # Полиморфные связи
@@ -246,3 +246,4 @@ stateDiagram-v2
 - [Таблицы классов](class-table-inheritance.md) дают общий супертип для ссылок.
 - [Таблица связей](association-table.md) разделяет связи конкретных целей.
 - [Отсутствующие внешние ключи](missing-foreign-keys.md) объясняют локальную целостность, которой не даёт обобщённая пара.
+- [Ссылка на файл](file-reference.md) противопоставляет полиморфную таблицу вложений Active Storage типизированным таблицам вложений.

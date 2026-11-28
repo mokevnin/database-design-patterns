@@ -258,3 +258,4 @@ For polling cleanup, delete only acknowledged rows older than the promised recov
 - [Version Column](version-column.md) provides the aggregate revision used by accepted changes.
 - [Missing Foreign Keys](missing-foreign-keys.md) challenges unvalidated aggregate references.
 - [Expand and Contract](expand-contract.md) stages event-production and consumer-contract changes.
+- [File Reference](file-reference.md) defers object-storage deletes until the database change commits.

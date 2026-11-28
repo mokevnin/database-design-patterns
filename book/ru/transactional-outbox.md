@@ -2,7 +2,7 @@
 group: reliable-writes
 status: translated
 related: [idempotency-record, queue-table]
-source_rev: 31edb231a2648b7eb5591b4f61fe9eeaead1a41e
+source_rev: 9ff4b21656c408eb755e07d44be7375e224ebaf5
 ---
 
 # Транзакционный outbox
@@ -263,3 +263,4 @@ flowchart TB
 - [Столбец версии](version-column.md) предоставляет ревизию агрегата принятых изменений.
 - [Отсутствующие внешние ключи](missing-foreign-keys.md) ставят под сомнение непроверенные ссылки агрегатов.
 - [Расширение и свёртывание](expand-contract.md) поэтапно меняет создание событий и контракты потребителей.
+- [Ссылка на файл](file-reference.md) откладывает удаление объектов в хранилище до фиксации изменения в базе.

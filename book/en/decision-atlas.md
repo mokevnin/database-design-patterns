@@ -378,6 +378,7 @@ Do workflows refer to the same enduring counterparty, and can its capacities ove
 | --- | --- | --- | --- |
 | [Party](party.md) | People and organizations share real counterparty references | Person/organization details belong to that identity | Identity resolution and merges affect every reference; sample does not require subtype details at commit |
 | [Role Object](role-object.md) | Retain the party across changing capacities | Roles overlap or recur with episode-specific attributes and references | Business-date queries and coordinated conflict-period maintenance |
+| [Permission Grant](permission-grant.md) | Application users, not parties or database logins, need rights | Job-function roles assigned within an organization or project scope, with conflicting duties excluded | Dated grants and revocation; the exclusion constraint cannot be added NOT VALID |
 | [Class Table Inheritance](class-table-inheritance.md) | Shared base with specific subtype targets | Intrinsic exclusive classification | Stronger exactly-one completeness adds an atomic creation/conversion protocol |
 | [Separate entities or fixed capacity columns](role-object.md) | Independent lifecycles, or one simple capacity | No shared-counterparty requirement, or no role attributes/history | Avoid episode machinery when its contract is unnecessary |
 

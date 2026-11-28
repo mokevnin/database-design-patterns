@@ -1,6 +1,6 @@
 # Candidates and voting
 
-Which topics should the book cover next? These are short proposals for new chapters. They are not accepted yet, and some may merge into existing patterns. The last two topics are proposed anti-patterns.
+Which topics should the book cover next? These are short proposals for new chapters. They are not accepted yet, and some may merge into existing patterns. The last topic is a proposed anti-pattern.
 
 The full list, sources, overlaps, and current statuses are in [CANDIDATES.md](https://github.com/mokevnin/database-design-patterns/blob/main/CANDIDATES.md).
 
@@ -24,5 +24,4 @@ Russian, English, and Spanish are welcome; participation requires a GitHub accou
 | Archive Table — moving old closed data out of live tables | `archive-table` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20archive-table%22) |
 | Permission Grant — roles, permissions and their assignments | `permission-grant` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20permission-grant%22) |
 | Edit Lock — pessimistic locking across requests | `edit-lock` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20edit-lock%22) |
-| Sentinel Rows — fake “Unknown” rows instead of a missing reference | `sentinel-rows` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20sentinel-rows%22) |
 | Guessable Links — public links built from sequential IDs or their hashes | `guessable-links` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20guessable-links%22) |

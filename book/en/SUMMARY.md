@@ -82,6 +82,7 @@
 * [Delimited Lists](delimited-lists.md)
 * [Mandatory Surrogates](mandatory-surrogates.md)
 * [Missing Foreign Keys](missing-foreign-keys.md)
+* [Sentinel Rows](sentinel-rows.md)
 * [Repeated Columns](repeated-columns.md)
 * [Polymorphic Associations](polymorphic-associations.md)
 * [Untyped Properties](untyped-properties.md)

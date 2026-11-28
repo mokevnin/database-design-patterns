@@ -301,6 +301,7 @@ Backfill precedes availability enforcement so retained retired assignments can b
 - Using the display label as the reference key, so a wording edit becomes a reference migration.
 - Using a changing schema list for business-managed values; see [Volatile Enums](volatile-enums.md). Conversely, adding a lookup table for a permanently fixed two-value rule may buy no useful maintenance capability.
 - Relying only on a dropdown; [Missing Foreign Keys](missing-foreign-keys.md) leaves other writers outside the membership rule.
+- Adding an `unknown` or `n/a` entry to stand for a missing value; record the absence on the referencing row instead, see [Sentinel Rows](sentinel-rows.md).
 
 ## Known uses
 

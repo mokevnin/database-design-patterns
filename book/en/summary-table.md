@@ -22,7 +22,7 @@ Copying yesterday's total into a table moves the problem to maintenance. A corre
 
 ## Solution
 
-Keep individual `sale` rows authoritative and store one `daily_sale` row per `(shop_id, business_day)`. Maintain both the count and sum; derive an average from those two values rather than averaging daily averages. Define the business day before insertion, including the time-zone policy outside this example, and do not combine amounts in different currencies. The lab fixes every shop to one reporting currency and stores integer cents.
+Keep individual `sale` rows authoritative and store one `daily_sale` row per `(shop_id, business_day)`. Maintain both the count and sum; derive an average from those two values rather than averaging daily averages. Define the business day before insertion, including the time-zone policy outside this example (see [Time Point](time-point.md)), and do not combine amounts in different currencies. The lab fixes every shop to one reporting currency and stores integer cents.
 
 Choose one maintenance owner. The example uses an application statement that changes the source and its summary together. PostgreSQL's [data-modifying CTEs](https://www.postgresql.org/docs/18/queries-with.html#QUERIES-WITH-MODIFYING) pass changed rows through `RETURNING`; the outer statement applies only their deltas. Treat the arithmetic and reconciliation query as part of the schema's write contract.
 

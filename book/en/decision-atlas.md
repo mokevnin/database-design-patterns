@@ -331,6 +331,7 @@ Which past question must you answer: recorded values, business validity, an earl
 
 | Pattern or option | Question it answers | Write and query requirement | Retention or engine boundary |
 | --- | --- | --- | --- |
+| [Time Point](time-point.md) | What kind of time is this value: an instant, a civil date or a local promise in a place? | `timestamptz` for instants, `date` for calendar positions, local time plus IANA zone for future wall-clock times; half-open ranges | Zone names follow the server's tzdata build; local days are 23 to 25 hours around transitions |
 | [History Table](history-table.md) | What row values were recorded at an instant? | Capture old values and query current plus closed versions | Define capture clock and retention; SQL Server native periods use transaction-begin time, unlike the chapter's processing clock |
 | [Effective Dating](effective-dating.md) | What applies on a business date, including future dates? | Explicit periods; prevent ambiguous overlapping schedules | PostgreSQL 18 temporal keys or exclusion; other implementations need coordinated overlap checks |
 | [Bitemporal Table](bitemporal-table.md) | What did we know at one date about another business date? | Preserve business and recorded periods through atomic corrections | More complex rectangle rule; one business-period overlap key alone rejects valid archived beliefs |

@@ -1,4 +1,4 @@
--- Checked on PostgreSQL 18.6.
+-- Checked on PostgreSQL 18.7.
 -- Run with psql -X -f table-split.sql in an empty database.
 -- Expected errors are intentional and checked by SQLSTATE.
 \set ON_ERROR_STOP on
@@ -83,4 +83,27 @@ DELETE FROM product WHERE product_id = 1;
 
 DO $$ BEGIN
     ASSERT (SELECT count(*) = 0 FROM product_detail) AND (SELECT count(*) = 1 FROM product);
+END $$;
+
+-- Personal data in an optional extension can be erased while references stay valid.
+CREATE TABLE customer (customer_id bigint PRIMARY KEY);
+CREATE TABLE customer_contact (
+    customer_id bigint PRIMARY KEY REFERENCES customer (customer_id) ON DELETE CASCADE,
+    full_name text NOT NULL,
+    email text NOT NULL
+);
+CREATE TABLE customer_order (
+    order_id bigint PRIMARY KEY,
+    customer_id bigint NOT NULL REFERENCES customer (customer_id)
+);
+INSERT INTO customer VALUES (7);
+INSERT INTO customer_contact VALUES (7, 'Ada Lovelace', 'ada@example.com');
+INSERT INTO customer_order VALUES (70, 7);
+DELETE FROM customer_contact WHERE customer_id = 7;
+
+DO $$ BEGIN
+    ASSERT (SELECT count(*) = 1 FROM customer_order AS o
+            LEFT JOIN customer_contact AS c USING (customer_id)
+            WHERE o.order_id = 70 AND c.customer_id IS NULL);
+    ASSERT (SELECT count(*) = 0 FROM customer_contact);
 END $$;

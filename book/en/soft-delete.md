@@ -85,7 +85,7 @@ The FK targets the full customer table. It preserves physical referential integr
 
 ## Implementation
 
-The [complete PostgreSQL 18.6 script](../assets/soft-delete/soft-delete.sql) verifies visibility, retained references, restore conflict, the archive alternative and physical-delete rejection:
+The [complete PostgreSQL 18.7 script](../assets/soft-delete/soft-delete.sql) verifies visibility, retained references, restore conflict, the archive alternative, physical-delete rejection and an aggregate restore by deletion operation:
 
 ```sql
 CREATE SCHEMA soft_example;
@@ -126,7 +126,7 @@ Restore of customer `1` now conflicts:
 UPDATE soft_example.customer SET deleted_at = NULL WHERE customer_id = 1;
 ```
 
-PostgreSQL 18.6 raises SQLSTATE `23505`: `ERROR: duplicate key value violates unique constraint "customer_live_email_key"`, with `DETAIL: Key (email)=(alex@example.com) already exists.` Decide whether the user must change an email, cancel the new registration, merge identities through a dedicated workflow or abandon the restore. Do not resolve the conflict by silently moving invoice references.
+PostgreSQL 18.7 raises SQLSTATE `23505`: `ERROR: duplicate key value violates unique constraint "customer_live_email_key"`, with `DETAIL: Key (email)=(alex@example.com) already exists.` Decide whether the user must change an email, cancel the new registration, merge identities through a dedicated workflow or abandon the restore. Do not resolve the conflict by silently moving invoice references.
 
 ```mermaid
 ---
@@ -146,6 +146,50 @@ stateDiagram-v2
 ```
 
 Purge is outside the reversible lifecycle. A deletion timestamp alone cannot tell a restoration workflow which children were independently deleted and which were hidden as part of a parent operation.
+
+For an aggregate, record the deletion as an operation and mark every row it hides with that operation's ID. A project owns tasks; deleting the project hides the project and its still-live tasks under one `deletion_id`, while a task deleted earlier keeps its own:
+
+```sql
+CREATE TABLE soft_example.deletion (
+    deletion_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    deleted_at timestamptz NOT NULL DEFAULT clock_timestamp()
+);
+CREATE TABLE soft_example.project (
+    project_id bigint PRIMARY KEY,
+    deletion_id bigint REFERENCES soft_example.deletion (deletion_id)
+);
+CREATE TABLE soft_example.task (
+    task_id bigint PRIMARY KEY,
+    project_id bigint NOT NULL REFERENCES soft_example.project (project_id),
+    deletion_id bigint REFERENCES soft_example.deletion (deletion_id)
+);
+WITH op AS (INSERT INTO soft_example.deletion DEFAULT VALUES RETURNING deletion_id),
+     hidden_project AS (
+         UPDATE soft_example.project SET deletion_id = (SELECT deletion_id FROM op)
+         WHERE project_id = 1 AND deletion_id IS NULL RETURNING project_id)
+UPDATE soft_example.task SET deletion_id = (SELECT deletion_id FROM op)
+WHERE project_id IN (SELECT project_id FROM hidden_project) AND deletion_id IS NULL;
+```
+
+Restoring that operation clears exactly the rows that carry its ID: `UPDATE ... SET deletion_id = NULL WHERE deletion_id = :op` on the project and the task tables in one transaction. The script verifies that a task deleted before the project stays deleted after the project returns. The deletion row is also the natural place for the actor and reason, or for the link to an [Audit Log](audit-log.md) event. Restoring a single child while its parent is still hidden must be refused by the restore operation, because the schema only records markers and does not compare them across tables.
+
+```mermaid
+---
+title: A deletion operation ID restores exactly what it hid
+---
+sequenceDiagram
+    participant U as User
+    participant P as project 1
+    participant T as tasks 10 and 11
+    U->>T: Delete task 11 alone, deletion 1
+    U->>P: Delete project 1, deletion 2
+    P->>T: Hide still-live task 10 with deletion 2
+    U->>P: Restore deletion 2
+    P->>T: Clear deletion 2 on task 10 only
+    Note over T: Task 11 keeps deletion 1 and stays deleted
+```
+
+A timestamp can only guess this line by equality, and the guess fails when two deletions run in one transaction and share the same `now()`, or when one cascade is stamped with several clock readings. In this design the marker is `deletion_id` rather than `deleted_at`, so live views and partial unique indexes test `deletion_id IS NULL`.
 
 If you want a recovery copy but prefer physical deletion from the live table, use an archive. The example archives customer `2`, which has no invoices, in one statement using [`DELETE ... RETURNING`](https://www.postgresql.org/docs/18/sql-delete.html) and a [data-modifying CTE](https://www.postgresql.org/docs/18/queries-with.html#QUERIES-WITH-MODIFYING):
 

@@ -1,4 +1,4 @@
--- Checked on PostgreSQL 18.6.
+-- Checked on PostgreSQL 18.7.
 -- Run with psql -X -f soft-delete.sql in an empty disposable database.
 -- Expected errors are displayed and asserted by SQLSTATE.
 \set ON_ERROR_STOP on
@@ -69,6 +69,49 @@ DELETE FROM soft_example.customer WHERE customer_id = 1;
 ROLLBACK TO SAVEPOINT physical_delete;
 SELECT :'rejected_state' = '23503' AS rejected \gset
 \if :rejected
+\else
+    SELECT 1 / 0;
+\endif
+
+-- An aggregate deletion marks every row it hides with one operation ID.
+CREATE TABLE soft_example.deletion (
+    deletion_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    deleted_at timestamptz NOT NULL DEFAULT clock_timestamp()
+);
+CREATE TABLE soft_example.project (
+    project_id bigint PRIMARY KEY,
+    deletion_id bigint REFERENCES soft_example.deletion (deletion_id)
+);
+CREATE TABLE soft_example.task (
+    task_id bigint PRIMARY KEY,
+    project_id bigint NOT NULL REFERENCES soft_example.project (project_id),
+    deletion_id bigint REFERENCES soft_example.deletion (deletion_id)
+);
+INSERT INTO soft_example.project VALUES (1, NULL);
+INSERT INTO soft_example.task VALUES (10, 1, NULL), (11, 1, NULL);
+
+-- Task 11 is deleted on its own first.
+WITH op AS (INSERT INTO soft_example.deletion DEFAULT VALUES RETURNING deletion_id)
+UPDATE soft_example.task SET deletion_id = (SELECT deletion_id FROM op)
+WHERE task_id = 11 AND deletion_id IS NULL;
+
+-- Deleting the project hides it and its still-live tasks under one operation.
+WITH op AS (INSERT INTO soft_example.deletion DEFAULT VALUES RETURNING deletion_id),
+     hidden_project AS (
+         UPDATE soft_example.project SET deletion_id = (SELECT deletion_id FROM op)
+         WHERE project_id = 1 AND deletion_id IS NULL RETURNING project_id)
+UPDATE soft_example.task SET deletion_id = (SELECT deletion_id FROM op)
+WHERE project_id IN (SELECT project_id FROM hidden_project) AND deletion_id IS NULL;
+SELECT deletion_id AS project_op FROM soft_example.project WHERE project_id = 1 \gset
+
+-- Restoring the project's operation brings back exactly what it hid.
+UPDATE soft_example.project SET deletion_id = NULL WHERE deletion_id = :project_op;
+UPDATE soft_example.task SET deletion_id = NULL WHERE deletion_id = :project_op;
+SELECT (SELECT deletion_id IS NULL FROM soft_example.project WHERE project_id = 1)
+   AND (SELECT deletion_id IS NULL FROM soft_example.task WHERE task_id = 10)
+   AND (SELECT deletion_id IS NOT NULL AND deletion_id <> :project_op
+        FROM soft_example.task WHERE task_id = 11) AS valid \gset
+\if :valid
 \else
     SELECT 1 / 0;
 \endif

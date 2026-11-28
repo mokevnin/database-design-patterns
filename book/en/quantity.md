@@ -103,7 +103,7 @@ The two foreign-key columns form one checked reference. Different units can shar
 
 ## Implementation
 
-The [complete PostgreSQL 18.6 script](../assets/quantity/quantity.sql) checks compatible addition, incompatible addition, storage rejection and currency-conversion refusal. Define the storage contract:
+The [complete PostgreSQL 18.7 script](../assets/quantity/quantity.sql) checks compatible addition, incompatible addition, storage rejection, currency-conversion refusal and an incomplete embedded quantity. Define the storage contract:
 
 ```sql
 CREATE SCHEMA quantity_example;
@@ -176,13 +176,32 @@ The schema rejects an amount labeled as mass with a volume unit:
 INSERT INTO measured_amount VALUES (3, 'mass', 2, 'L');
 ```
 
-PostgreSQL 18.6 raises SQLSTATE `23503`: `ERROR: insert or update on table "measured_amount" violates foreign key constraint "amount_unit_dimension_fk"`. The arithmetic path also rejects incompatible operands:
+PostgreSQL 18.7 raises SQLSTATE `23503`: `ERROR: insert or update on table "measured_amount" violates foreign key constraint "amount_unit_dimension_fk"`. The arithmetic path also rejects incompatible operands:
 
 ```sql
 SELECT add_quantities(2, 'kg', 1, 'L');
 ```
 
 It raises SQLSTATE `22023`: `ERROR: incompatible quantity dimensions`. Merely storing units without checking arithmetic would not catch this mistake.
+
+A quantity is a value, not a row of its own, so a table that holds one usually stores it as a group of its own columns: Fowler's [Embedded Value](https://martinfowler.com/eaaCatalog/embeddedValue.html). When the value is optional, the group must be complete or absent. A composite foreign key with the default `MATCH SIMPLE` is skipped as soon as one of its columns is null, so it cannot catch half a value on its own:
+
+```sql
+CREATE TABLE parcel (
+    parcel_id bigint PRIMARY KEY,
+    declared_amount numeric,
+    declared_unit text,
+    declared_dimension text CHECK (declared_dimension IS NULL OR declared_dimension = 'mass'),
+    CONSTRAINT declared_weight_complete
+        CHECK (num_nulls(declared_amount, declared_unit, declared_dimension) IN (0, 3)),
+    CONSTRAINT declared_weight_unit_fk FOREIGN KEY (declared_unit, declared_dimension)
+        REFERENCES unit (unit_code, dimension)
+);
+INSERT INTO parcel VALUES (1, NULL, NULL, NULL), (2, 2.5, 'kg', 'mass');
+INSERT INTO parcel VALUES (3, 2.5, NULL, NULL);
+```
+
+The first two rows are accepted: no declared weight, and a complete one. The third raises SQLSTATE `23514`: `ERROR: new row for relation "parcel" violates check constraint "declared_weight_complete"`. [`num_nulls`](https://www.postgresql.org/docs/18/functions-comparison.html) counts null arguments, so the same check covers groups of any width; `MATCH FULL` on the foreign key covers only the referencing columns. A PostgreSQL composite type could bundle amount and unit into one column, but a foreign key cannot reference a field inside a composite value: `FOREIGN KEY ((declared).unit_code)` is a syntax error. Keep the value as ordinary columns while its unit must be a checked reference, and move it to its own table only when it repeats or has a lifecycle of its own ([Repeated Columns](repeated-columns.md), [Table Split](table-split.md)).
 
 For money, store the currency key with every amount and choose when rounding occurs: per line, per tax calculation or at the final total. PostgreSQL's [`numeric` rounds ties away from zero](https://www.postgresql.org/docs/18/datatype-numeric.html), demonstrated here:
 

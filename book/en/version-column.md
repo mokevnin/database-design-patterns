@@ -8,7 +8,7 @@ related: [reservation, status-history, ordered-collection]
 
 ## Intent
 
-A version column implements optimistic locking: each row carries a counter or timestamp, and an update succeeds only if the version is still the one the client read. Two people editing the same record no longer overwrite each other silently — the second gets a conflict and can reload. The chapter shows the update statement and how to detect zero affected rows, how ORMs implement it, native row versions such as `rowversion` in SQL Server and `xmin` in PostgreSQL, and when pessimistic locking is the better choice.
+A version column implements optimistic locking: each row carries a counter or timestamp, and an update succeeds only if the version is still the one the client read. Two people editing the same record no longer overwrite each other silently — the second gets a conflict and can reload. The chapter shows the update statement and how to detect zero affected rows, how ORMs implement it, native row versions such as `rowversion` in SQL Server and `xmin` in PostgreSQL, and when [pessimistic locking](edit-lock.md) is the better choice.
 
 ## Also known as
 
@@ -225,3 +225,4 @@ Keep a rollback-compatible writer that still advances versions even if the UI st
 - [Idempotency Record](idempotency-record.md) recovers a command's result after a lost response.
 - [Expand and Contract](expand-contract.md) coordinates old writers and new preconditions.
 - [Proposed Change](proposed-change.md) keeps the token in a pending proposal, so an approved change applied later cannot overwrite a newer value.
+- [Edit Lock](edit-lock.md) prevents conflicts up front when long edits cannot be merged.

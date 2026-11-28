@@ -18,4 +18,3 @@ Russian, English, and Spanish are welcome; participation requires a GitHub accou
 | Recurrence Rule — repeating events with exceptions | `recurrence-rule` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20recurrence-rule%22) |
 | Archive Table — moving old closed data out of live tables | `archive-table` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20archive-table%22) |
 | Permission Grant — roles, permissions and their assignments | `permission-grant` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20permission-grant%22) |
-| Edit Lock — pessimistic locking across requests | `edit-lock` | [Discuss / vote](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20edit-lock%22) |

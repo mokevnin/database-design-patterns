@@ -309,3 +309,4 @@ Delete finished jobs in bounded batches after the diagnostic and deduplication w
 - [Reservation](reservation.md) gives domain capacity claims their own lifecycle.
 - [Missing Foreign Keys](missing-foreign-keys.md) explains the typed reference retained by this example.
 - [Expand and Contract](expand-contract.md) stages payload and worker upgrades while preserving accepted jobs.
+- [Edit Lock](edit-lock.md) applies the same lease and generation to a human editor.

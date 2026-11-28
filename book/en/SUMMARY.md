@@ -65,6 +65,7 @@
 ## Reliable Writes
 
 * [Version Column](version-column.md)
+* [Edit Lock](edit-lock.md)
 * [Reservation](reservation.md)
 * [Idempotency Record](idempotency-record.md)
 * [Transactional Outbox](transactional-outbox.md)

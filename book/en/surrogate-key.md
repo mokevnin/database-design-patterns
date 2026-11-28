@@ -181,6 +181,24 @@ erDiagram
 
 These are independent alternative tables, each with a UUID primary key. A real conversion must also change every referencing column to the matching type.
 
+### Customer IDs from two systems
+
+Your CRM sends customer `42`. Your billing system also sends customer `42`, but the numbers come from independent sequences. Looking up the number alone could post an invoice to the wrong account. Keep each source’s identifier as text (including any leading zeros) and qualify it with the system that issued it.
+
+```sql
+CREATE TABLE customer_source_id (
+    source_system text NOT NULL,
+    external_id text NOT NULL,
+    customer_id bigint NOT NULL REFERENCES customer (customer_id),
+    PRIMARY KEY (source_system, external_id)
+);
+
+SELECT customer_id FROM customer_source_id
+WHERE source_system = 'crm' AND external_id = '42';
+```
+
+Suppose CRM customer `42` and billing customer `007` have been confirmed as the same customer. Store both mappings with the same local `customer_id`. Billing customer `42` can map to a different local customer. On the next import, look up the pair before creating a customer. For an unfamiliar pair, use a verified business key or ask an operator to match it. If you create a customer, insert the customer and its mapping in one transaction. If a concurrent import claims the pair first, roll back and read the winning mapping. Orders still reference the local key, and API clients can keep using the [public identifier](public-identifier.md) your application issued.
+
 ## Engine support
 
 - **PostgreSQL 18:** use the identity and UUID definitions above. An identity is an allocator plus a constraint, not a business numbering service.

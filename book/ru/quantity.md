@@ -2,7 +2,7 @@
 group: domain-structures
 status: translated
 related: [observation, inexact-arithmetic, double-entry-ledger]
-source_rev: 3e5c3bbc6bf676518c355fd8c4a9e5eabe21ed84
+source_rev: 30a19f41c7484fde71a4e84d5bcba719672c4277
 ---
 
 # Величина
@@ -104,7 +104,7 @@ erDiagram
 
 ## Реализация
 
-[Полный скрипт PostgreSQL 18.6](../assets/quantity/quantity.sql) проверяет совместимое и несовместимое сложение, отказ хранения и запрет конвертации валют. Определите контракт хранения:
+[Полный скрипт PostgreSQL 18.7](../assets/quantity/quantity.sql) проверяет совместимое и несовместимое сложение, отказ хранения, запрет конвертации валют и неполную встроенную величину. Определите контракт хранения:
 
 ```sql
 CREATE SCHEMA quantity_example;
@@ -177,13 +177,32 @@ FROM measured_amount WHERE amount_id = 2;
 INSERT INTO measured_amount VALUES (3, 'mass', 2, 'L');
 ```
 
-PostgreSQL 18.6 возвращает SQLSTATE `23503`: `ERROR: insert or update on table "measured_amount" violates foreign key constraint "amount_unit_dimension_fk"`. Арифметический путь тоже отклоняет несовместимые операнды:
+PostgreSQL 18.7 возвращает SQLSTATE `23503`: `ERROR: insert or update on table "measured_amount" violates foreign key constraint "amount_unit_dimension_fk"`. Арифметический путь тоже отклоняет несовместимые операнды:
 
 ```sql
 SELECT add_quantities(2, 'kg', 1, 'L');
 ```
 
 Он возвращает SQLSTATE `22023`: `ERROR: incompatible quantity dimensions`. Само хранение единиц без проверки арифметики не поймало бы ошибку.
+
+Величина — это значение, а не отдельная строка, поэтому таблица, которая её содержит, обычно хранит её как группу собственных столбцов: [Embedded Value](https://martinfowler.com/eaaCatalog/embeddedValue.html) у Фаулера. Если значение необязательно, группа должна быть либо полной, либо отсутствовать целиком. Составной внешний ключ с режимом по умолчанию `MATCH SIMPLE` не проверяется, как только один из его столбцов равен NULL, поэтому сам по себе половину значения не поймает:
+
+```sql
+CREATE TABLE parcel (
+    parcel_id bigint PRIMARY KEY,
+    declared_amount numeric,
+    declared_unit text,
+    declared_dimension text CHECK (declared_dimension IS NULL OR declared_dimension = 'mass'),
+    CONSTRAINT declared_weight_complete
+        CHECK (num_nulls(declared_amount, declared_unit, declared_dimension) IN (0, 3)),
+    CONSTRAINT declared_weight_unit_fk FOREIGN KEY (declared_unit, declared_dimension)
+        REFERENCES unit (unit_code, dimension)
+);
+INSERT INTO parcel VALUES (1, NULL, NULL, NULL), (2, 2.5, 'kg', 'mass');
+INSERT INTO parcel VALUES (3, 2.5, NULL, NULL);
+```
+
+Первые две строки принимаются: заявленного веса нет или он полный. Третья выдаёт SQLSTATE `23514`: `ERROR: new row for relation "parcel" violates check constraint "declared_weight_complete"`. [`num_nulls`](https://www.postgresql.org/docs/18/functions-comparison.html) считает аргументы, равные NULL, поэтому та же проверка подходит для группы любой ширины; `MATCH FULL` у внешнего ключа покрывает только ссылающиеся столбцы. Составной тип PostgreSQL мог бы объединить число и единицу в один столбец, но внешний ключ не может ссылаться на поле внутри составного значения: `FOREIGN KEY ((declared).unit_code)` — синтаксическая ошибка. Храните значение обычными столбцами, пока его единица должна быть проверяемой ссылкой, и выносите его в отдельную таблицу, только когда оно повторяется или живёт своей жизнью ([Повторяющиеся столбцы](repeated-columns.md), [Разделение таблицы](table-split.md)).
 
 Для денег храните ключ валюты при каждой сумме и выбирайте момент округления: по строке, при вычислении налога или в окончательном итоге. [`numeric` PostgreSQL округляет середины от нуля](https://www.postgresql.org/docs/18/datatype-numeric.html), как здесь:
 

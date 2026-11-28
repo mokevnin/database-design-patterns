@@ -173,7 +173,7 @@ The groups and chapter order below follow the book's [Summary](SUMMARY.md). Each
 | Chapter | Script | Demonstration |
 | --- | --- | --- |
 | [Association Table](association-table.md) | [association-table.sql](../assets/association-table/association-table.sql) | Membership attributes, pair uniqueness, endpoint FKs and cascade effects. |
-| [Table Split](table-split.md) | [table-split.sql](../assets/table-split/table-split.sql) | Optional shared-key details and the deferred mandatory-extension variant. |
+| [Table Split](table-split.md) | [table-split.sql](../assets/table-split/table-split.sql) | Optional shared-key details, the deferred mandatory-extension variant and erasable personal data. |
 | [Ordered Collection](ordered-collection.md) | [ordered-collection.sql](../assets/ordered-collection/ordered-collection.sql) | Gapped positions, renumbering, swaps and owner-scoped uniqueness. |
 | [Localized Values](localized-values.md) | [localized-values.sql](../assets/localized-values/localized-values.sql) | Translation rows, required default, atomic default switch and language-specific search. |
 
@@ -213,7 +213,7 @@ The groups and chapter order below follow the book's [Summary](SUMMARY.md). Each
 | [Effective Dating](effective-dating.md) | [effective-dating.sql](../assets/effective-dating/effective-dating.sql) | Nonoverlapping business periods, as-of selection and temporal coverage references. |
 | [Bitemporal Table](bitemporal-table.md) | [bitemporal-table.sql](../assets/bitemporal-table/bitemporal-table.sql) | Correct business history while retaining earlier recorded beliefs and overlap protection. |
 | [Audit Log](audit-log.md) | [audit-log.sql](../assets/audit-log/audit-log.sql) | Attributed atomic actions and runtime permissions that reject evidence rewriting. |
-| [Soft Delete](soft-delete.md) | [soft-delete.sql](../assets/soft-delete/soft-delete.sql) | Live-only uniqueness, retained references, restore conflict and physical-delete protection. |
+| [Soft Delete](soft-delete.md) | [soft-delete.sql](../assets/soft-delete/soft-delete.sql) | Live-only uniqueness, retained references, restore conflict, physical-delete protection and aggregate restore by deletion operation. |
 
 ### Domain Structures
 
@@ -221,7 +221,7 @@ The groups and chapter order below follow the book's [Summary](SUMMARY.md). Each
 | --- | --- | --- |
 | [Party](party.md) | [party.sql](../assets/party/party.sql) | Common counterparty identity, typed extensions and registration uniqueness. |
 | [Role Object](role-object.md) | [role-object.sql](../assets/role-object/role-object.sql) | Dated participation episodes, typed role references and conflicting-period rejection. |
-| [Quantity](quantity.md) | [quantity.sql](../assets/quantity/quantity.sql) | Compatible multiplicative conversions, dimension checks and refused currency conversion. |
+| [Quantity](quantity.md) | [quantity.sql](../assets/quantity/quantity.sql) | Compatible multiplicative conversions, dimension checks, refused currency conversion and a complete-or-absent embedded quantity. |
 | [Observation](observation.md) | [observation.sql](../assets/observation/observation.sql) | Immutable typed evidence, replacements, rejection and derived observation status. |
 | [Bill of Materials](bill-of-materials.md) | [bill-of-materials.sql](../assets/bill-of-materials/bill-of-materials.sql) | Release/pin recipe versions, explode path quantities and select releases by business date. |
 | [Double-Entry Ledger](double-entry-ledger.md) | [double-entry-ledger.sql](../assets/double-entry-ledger/double-entry-ledger.sql) | Balanced atomic posting, immutable entries, currency checks and exact reversal. |

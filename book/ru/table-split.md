@@ -2,7 +2,7 @@
 group: relationships
 status: translated
 related: [class-table-inheritance, json-column]
-source_rev: 0d5af2dffd0cbe2d7070b6d88b9d3d756c08a6ef
+source_rev: 30a19f41c7484fde71a4e84d5bcba719672c4277
 ---
 
 # Разделение таблицы
@@ -31,7 +31,7 @@ Split Table в [каталоге рефакторингов Эмблера и С
 
 | Соседний паттерн | Связь | Определяющее требование |
 | --- | --- | --- |
-| Обычные столбцы в исходной таблице | Замена | Атрибуты обычно читаются и меняются вместе; соединение не создаёт полезной границы |
+| Обычные столбцы в исходной таблице ([Embedded Value](https://martinfowler.com/eaaCatalog/embeddedValue.html)) | Замена | Атрибуты обычно читаются и меняются вместе; соединение не создаёт полезной границы |
 | [Столбец JSON](json-column.md) | Замена для гибкой формы подробностей; дополнение внутри таблицы подробностей | Структура меняется, а не просто необязательна или редко используется |
 | [Таблицы классов](class-table-inheritance.md) | Дополнение с похожей формой ключей | Расширение представляет подтип с собственными правилами, а не ещё одну часть каждого товара |
 | [Локализованные значения](localized-values.md) | Замена для переводимых атрибутов подробностей | Одной сущности нужны строки для нескольких языков, а не не более одного расширения |
@@ -72,6 +72,7 @@ erDiagram
 - У необязательной группы есть осмысленный общий жизненный цикл, а её поля должны быть обязательными, когда группа существует.
 - Вы измерили выигрыш от чтения более компактной основной записи или обновления отдельных строк.
 - Граница таблицы упрощает управление правами для отдельно администрируемых атрибутов.
+- Персональные данные должны быть стираемыми, а записи, которые ссылаются на человека, должны остаться.
 
 ## Последствия и компромиссы
 
@@ -85,7 +86,7 @@ erDiagram
 
 ## Реализация
 
-[Полный скрипт](../assets/table-split/table-split.sql) охватывает необязательное и обязательное расширения:
+[Полный скрипт PostgreSQL 18.7](../assets/table-split/table-split.sql) охватывает необязательное и обязательное расширения и стираемые персональные данные:
 
 ```sql
 CREATE TABLE product (
@@ -112,7 +113,7 @@ UPDATE product_detail SET specification = 'Ash frame' WHERE product_id = 1;
 INSERT INTO product_detail VALUES (1, 'Another specification');
 ```
 
-PostgreSQL 18.6 возвращает SQLSTATE `23505`: `ERROR: duplicate key value violates unique constraint "product_detail_pkey"`, с уточнением `DETAIL: Key (product_id)=(1) already exists.` Для ровно одного расширения добавьте обратную ссылку, а не предполагайте, что внешний ключ потомка уже это гарантирует:
+PostgreSQL 18.7 возвращает SQLSTATE `23505`: `ERROR: duplicate key value violates unique constraint "product_detail_pkey"`, с уточнением `DETAIL: Key (product_id)=(1) already exists.` Для ровно одного расширения добавьте обратную ссылку, а не предполагайте, что внешний ключ потомка уже это гарантирует:
 
 ```sql
 CREATE TABLE account (
@@ -186,6 +187,27 @@ stateDiagram-v2
 ```
 
 Успешные вставки не завершают операцию, пока отложенная проверка не пройдена при фиксации. Если закрытой строки нет, откат удаляет и только что вставленного родителя.
+
+Та же необязательная форма позволяет стереть персональные данные и сохранить записи, которые указывают на человека. Заказы и события аудита ссылаются на `customer`, где лежат только идентичность и неперсональные атрибуты; имя, email и телефон хранятся в `customer_contact`:
+
+```sql
+CREATE TABLE customer (customer_id bigint PRIMARY KEY);
+CREATE TABLE customer_contact (
+    customer_id bigint PRIMARY KEY REFERENCES customer (customer_id) ON DELETE CASCADE,
+    full_name text NOT NULL,
+    email text NOT NULL
+);
+CREATE TABLE customer_order (
+    order_id bigint PRIMARY KEY,
+    customer_id bigint NOT NULL REFERENCES customer (customer_id)
+);
+INSERT INTO customer VALUES (7);
+INSERT INTO customer_contact VALUES (7, 'Ada Lovelace', 'ada@example.com');
+INSERT INTO customer_order VALUES (70, 7);
+DELETE FROM customer_contact WHERE customer_id = 7;
+```
+
+Заказ сохраняет корректную ссылку, а левое соединение теперь показывает клиента без контактных данных. Стирание сводится к удалению одной строки вместо поиска по всем таблицам, а история становится псевдонимной, а не исчезает. Оставляйте это расширение необязательным: обязательный вариант выше запретил бы именно то удаление, которое вам нужно. Разделение не стирает копии в других местах: [журнал аудита](audit-log.md) со значениями до и после, резервные копии, реплики и выгрузки требуют собственной политики, а основания и исключения для стирания задаёт [статья 17](https://eur-lex.europa.eu/eli/reg/2016/679/art_17/oj/eng) GDPR.
 
 ## Поддержка в движках
 

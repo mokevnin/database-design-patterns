@@ -1,4 +1,4 @@
--- Checked on PostgreSQL 18.6 (Homebrew).
+-- Checked on PostgreSQL 18.7.
 -- Multiplicative units only. Currency conversion is deliberately excluded.
 \set ON_ERROR_STOP on
 CREATE SCHEMA quantity_example;
@@ -79,4 +79,29 @@ BEGIN
     ASSERT add_quantities(2, 'kg', 500, 'g') = 2.5;
     ASSERT (SELECT sum(a.amount * u.to_base)
             FROM measured_amount AS a JOIN unit AS u USING (unit_code, dimension)) = 2.75;
+END $$;
+
+-- An optional embedded quantity is complete or absent.
+CREATE TABLE parcel (
+    parcel_id bigint PRIMARY KEY,
+    declared_amount numeric,
+    declared_unit text,
+    declared_dimension text CHECK (declared_dimension IS NULL OR declared_dimension = 'mass'),
+    CONSTRAINT declared_weight_complete
+        CHECK (num_nulls(declared_amount, declared_unit, declared_dimension) IN (0, 3)),
+    CONSTRAINT declared_weight_unit_fk FOREIGN KEY (declared_unit, declared_dimension)
+        REFERENCES unit (unit_code, dimension)
+);
+INSERT INTO parcel VALUES (1, NULL, NULL, NULL), (2, 2.5, 'kg', 'mass');
+
+DO $$
+BEGIN
+    BEGIN
+        INSERT INTO parcel VALUES (3, 2.5, NULL, NULL);
+        RAISE EXCEPTION 'expected incomplete embedded quantity';
+    EXCEPTION WHEN check_violation THEN
+        IF SQLERRM NOT LIKE '%declared_weight_complete%' THEN RAISE; END IF;
+        RAISE NOTICE 'expected SQLSTATE %: %', SQLSTATE, SQLERRM;
+    END;
+    ASSERT (SELECT count(*) FROM parcel) = 2;
 END $$;

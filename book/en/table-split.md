@@ -30,7 +30,7 @@ For a mandatory extension, add the reverse foreign key too: the parent's key mus
 
 | Sibling | Relationship | Deciding requirement |
 | --- | --- | --- |
-| Keep ordinary columns in the original table | Replacement | The attributes are usually read and changed together; a join adds no useful boundary |
+| Keep ordinary columns in the original table ([Embedded Value](https://martinfowler.com/eaaCatalog/embeddedValue.html)) | Replacement | The attributes are usually read and changed together; a join adds no useful boundary |
 | [JSON Column](json-column.md) | Replacement for flexible detail shape; complement inside the detail table | Structure varies, rather than merely being optional or cold |
 | [Class Table Inheritance](class-table-inheritance.md) | Complement using a similar key shape | The extension represents a subtype with type-specific rules, rather than another part of every product |
 | [Localized Values](localized-values.md) | Replacement for translated detail attributes | One entity needs several language-specific rows, rather than at most one extension |
@@ -71,6 +71,7 @@ The detail uses the same identity as its owner. No second generated ID or redund
 - An optional group has a meaningful lifecycle as a whole, and its fields should be mandatory when that group exists.
 - You have measured a benefit from reading a smaller core or updating separate rows.
 - A table boundary makes permission management simpler for separately managed attributes.
+- Personal data must be erasable while records that refer to the person must stay.
 
 ## Consequences and trade-offs
 
@@ -84,7 +85,7 @@ Do not assume a long `text` value forces every core read to fetch all its bytes.
 
 ## Implementation
 
-The [complete script](../assets/table-split/table-split.sql) covers both optional and mandatory extensions:
+The [complete PostgreSQL 18.7 script](../assets/table-split/table-split.sql) covers optional and mandatory extensions and erasable personal data:
 
 ```sql
 CREATE TABLE product (
@@ -111,7 +112,7 @@ The query returns `(CHAIR, Oak frame)` and `(DESK, NULL)`. An inner join would o
 INSERT INTO product_detail VALUES (1, 'Another specification');
 ```
 
-PostgreSQL 18.6 raises SQLSTATE `23505`: `ERROR: duplicate key value violates unique constraint "product_detail_pkey"`, with `DETAIL: Key (product_id)=(1) already exists.` For exactly one extension, add the reverse reference, rather than assuming the child foreign key already guarantees it:
+PostgreSQL 18.7 raises SQLSTATE `23505`: `ERROR: duplicate key value violates unique constraint "product_detail_pkey"`, with `DETAIL: Key (product_id)=(1) already exists.` For exactly one extension, add the reverse reference, rather than assuming the child foreign key already guarantees it:
 
 ```sql
 CREATE TABLE account (
@@ -185,6 +186,27 @@ stateDiagram-v2
 ```
 
 Successful inserts do not complete the operation until the deferred check passes at commit. If the private row is missing, rollback removes the newly inserted parent too.
+
+The same optional shape lets you erase personal data while keeping the records that point to the person. Orders and audit events reference `customer`, which holds only identity and non-personal attributes; name, email and phone live in `customer_contact`:
+
+```sql
+CREATE TABLE customer (customer_id bigint PRIMARY KEY);
+CREATE TABLE customer_contact (
+    customer_id bigint PRIMARY KEY REFERENCES customer (customer_id) ON DELETE CASCADE,
+    full_name text NOT NULL,
+    email text NOT NULL
+);
+CREATE TABLE customer_order (
+    order_id bigint PRIMARY KEY,
+    customer_id bigint NOT NULL REFERENCES customer (customer_id)
+);
+INSERT INTO customer VALUES (7);
+INSERT INTO customer_contact VALUES (7, 'Ada Lovelace', 'ada@example.com');
+INSERT INTO customer_order VALUES (70, 7);
+DELETE FROM customer_contact WHERE customer_id = 7;
+```
+
+The order keeps its valid reference, and a left join now shows the customer without contact data. Erasure is a delete of one row rather than a hunt through every table, and the history stays pseudonymous instead of disappearing. Keep this extension optional: the mandatory variant above would forbid exactly the deletion you need. The split does not erase copies elsewhere: an [Audit Log](audit-log.md) with before/after payloads, backups, replicas and exports need their own policy, and GDPR [Article 17](https://eur-lex.europa.eu/eli/reg/2016/679/art_17/oj/eng) sets the grounds and exceptions for erasure.
 
 ## Engine support
 

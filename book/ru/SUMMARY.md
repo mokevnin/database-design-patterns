@@ -65,6 +65,7 @@
 ## Надёжная запись
 
 * [Столбец версии](version-column.md)
+* [Блокировка редактирования](edit-lock.md)
 * [Резервирование](reservation.md)
 * [Запись идемпотентности](idempotency-record.md)
 * [Транзакционный outbox](transactional-outbox.md)

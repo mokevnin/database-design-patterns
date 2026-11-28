@@ -2,7 +2,7 @@
 group: reliable-writes
 status: translated
 related: [reservation, status-history, ordered-collection]
-source_rev: adc574108c92b21edcbe529ca62fd667d8f806ad
+source_rev: cc2aa03c461fba9fb7a02e8410c664263c70980d
 ---
 
 # Столбец версии
@@ -225,3 +225,4 @@ flowchart TB
 - [Упорядоченная коллекция](ordered-collection.md) может использовать один токен родителя для показанного порядка.
 - [Запись идемпотентности](idempotency-record.md) восстанавливает результат команды после потери ответа.
 - [Расширение и свёртывание](expand-contract.md) координирует старых писателей и новые предусловия.
+- [Предложенное изменение](proposed-change.md) хранит токен в ожидающем предложении, поэтому одобренное и позже применённое изменение не перезапишет более новое значение.

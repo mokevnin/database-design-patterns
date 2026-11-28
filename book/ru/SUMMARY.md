@@ -25,6 +25,7 @@
 
 * [Таблица значений](lookup-table.md)
 * [История статусов](status-history.md)
+* [Предложенное изменение](proposed-change.md)
 
 ## Иерархии
 

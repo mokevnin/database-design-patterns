@@ -2,7 +2,7 @@
 group: reference-and-state
 status: translated
 related: [lookup-table, history-table, audit-log, version-column]
-source_rev: 0d5af2dffd0cbe2d7070b6d88b9d3d756c08a6ef
+source_rev: cc2aa03c461fba9fb7a02e8410c664263c70980d
 ---
 
 # История статусов
@@ -319,3 +319,4 @@ flowchart TB
 - [Столбец версии](version-column.md) обеспечивает проверку устаревшей команды или альтернативу оптимистической записи.
 - [Запись идемпотентности](idempotency-record.md) разрешает повторы после неопределённых фиксаций.
 - [Расширение и свёртывание](expand-contract.md) задаёт структуру внедрения вместо неконтролируемой записи статусов.
+- [Предложенное изменение](proposed-change.md) держит запрошенное изменение, пока его не одобрит второй человек, и применяет его относительно версии, на которой оно основано.

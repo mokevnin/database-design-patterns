@@ -2,7 +2,7 @@
 group: reliable-writes
 status: translated
 related: [effective-dating, version-column, queue-table]
-source_rev: bf5f6b7008ef32f3a7e21a153cde728c02db1e56
+source_rev: 1192fba71969c0b239bb907e4cd7c53ac9ac9715
 ---
 
 # Резервирование
@@ -298,3 +298,4 @@ stateDiagram-v2
 - [Двойная запись](double-entry-ledger.md) регистрирует сохраняющие количество движения запасов или денег.
 - [Неточная арифметика](inexact-arithmetic.md) объясняет, почему точным количествам нужно точное представление.
 - [Блокировка редактирования](edit-lock.md) удерживает исключительное право редактировать, а не ёмкость.
+- [Правило повторения](recurrence-rule.md) порождает конкретные экземпляры, которые занимают повторяющиеся бронирования.

@@ -13,4 +13,3 @@
 | Тема | Идентификатор | Обсуждение |
 |---|---|---|
 | Слияние записей — объединение дублей без потери ссылок | `record-merge` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20record-merge%22) |
-| Правило повторения — повторяющиеся события с исключениями | `recurrence-rule` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20recurrence-rule%22) |

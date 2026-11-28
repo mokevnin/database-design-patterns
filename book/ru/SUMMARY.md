@@ -50,6 +50,7 @@
 * [Момент времени](time-point.md)
 * [Таблица истории](history-table.md)
 * [Период действия](effective-dating.md)
+* [Правило повторения](recurrence-rule.md)
 * [Зафиксированное значение](captured-value.md)
 * [Битемпоральная таблица](bitemporal-table.md)
 * [Журнал аудита](audit-log.md)

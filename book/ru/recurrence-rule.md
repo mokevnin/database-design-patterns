@@ -2,7 +2,7 @@
 group: time-and-deletion
 status: translated
 related: [time-point, effective-dating, reservation, status-history, version-column, summary-table]
-source_rev:
+source_rev: 1192fba71969c0b239bb907e4cd7c53ac9ac9715
 ---
 
 # Правило повторения

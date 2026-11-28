@@ -27,12 +27,13 @@
 * [История статусов](status-history.md)
 * [Предложенное изменение](proposed-change.md)
 
-## Иерархии
+## Иерархии и графы
 
 * [Список смежности](adjacency-list.md)
 * [Материализованный путь](materialized-path.md)
 * [Вложенные множества](nested-sets.md)
 * [Таблица замыканий](closure-table.md)
+* [Рёбра графа](graph-edges.md)
 
 ## Типы и атрибуты
 

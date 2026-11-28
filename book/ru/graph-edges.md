@@ -2,7 +2,7 @@
 group: hierarchies
 status: translated
 related: [adjacency-list, closure-table, bill-of-materials, association-table, fixed-depth-queries]
-source_rev:
+source_rev: 68378dc5cd7f536a5bedc95b9bc0b121a9d05b24
 ---
 
 # Рёбра графа

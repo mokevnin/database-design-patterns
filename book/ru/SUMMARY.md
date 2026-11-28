@@ -41,6 +41,7 @@
 
 ## Время и удаление
 
+* [Момент времени](time-point.md)
 * [Таблица истории](history-table.md)
 * [Период действия](effective-dating.md)
 * [Битемпоральная таблица](bitemporal-table.md)

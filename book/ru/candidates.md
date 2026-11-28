@@ -19,7 +19,6 @@
 | Ссылка на файл — файлы вне базы и строки с их метаданными | `file-reference` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20file-reference%22) |
 | Предложенное изменение — черновики и изменения, требующие подтверждения | `proposed-change` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20proposed-change%22) |
 | Рёбра графа — связи «многие ко многим» внутри одной таблицы | `graph-edges` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20graph-edges%22) |
-| Момент времени — метки времени, даты, часовые пояса и точность | `time-point` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20time-point%22) |
 | Зафиксированное значение — цены и адреса на момент заказа | `captured-value` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20captured-value%22) |
 | Правило повторения — повторяющиеся события с исключениями | `recurrence-rule` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20recurrence-rule%22) |
 | Архивная таблица — перенос старых закрытых данных из рабочих таблиц | `archive-table` | [Обсудить / голосовать](https://github.com/mokevnin/database-design-patterns/issues?q=is%3Aissue%20%22%5BCandidate%5D%20archive-table%22) |

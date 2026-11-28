@@ -2,7 +2,7 @@
 group: identity
 status: translated
 related: [party, external-reference, dependent-table, surrogate-key, public-identifier, audit-log, soft-delete, canonical-value]
-source_rev:
+source_rev: dfd6531e2c04c13ef73ae8256234c7206c38e7a1
 ---
 
 # Слияние записей
@@ -381,7 +381,6 @@ sequenceDiagram
 
 ## Известные применения
 
-- Salesforce, [триггеры Apex при слиянии](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexref/apex_triggers_merge_statements.htm): слияние удаляет проигравшие записи, переназначает их дочерние записи и записывает в поле `MasterRecordId` каждой удалённой записи ID победившей.
 - [Слияние записей в HubSpot](https://knowledge.hubspot.com/records/merge-records) по умолчанию создаёт для объединённой записи новый ID и хранит ID всех влитых в неё записей в свойстве «Merged [record] IDs», чтобы по старым ID можно было искать. Значения свойств основной записи имеют приоритет, а статья прямо говорит, что разъединить записи невозможно.
 - [Идентификаторы MusicBrainz](https://musicbrainz.org/doc/MusicBrainz_Identifier): «When an entity is merged into another, its MBIDs redirect to the other entity». [Схема сервера](https://github.com/metabrainz/musicbrainz-server/blob/master/admin/sql/CreateTables.sql) хранит их в таблицах вроде `artist_gid_redirect (gid, new_id)` — это вариант с таблицей перенаправлений.
 
